@@ -1,0 +1,31 @@
+BEGIN TRANSACTION;
+CREATE TABLE `User` (
+	`User_ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,ユーザID
+	`Name`	TEXT NOT NULL UNIQUE,ユーザ名
+	`PassWord`	TEXT NOT NULL,
+	`Grade`	TEXT NOT NULL,学年
+	`Active_Time_start`	INTEGER NOT NULL,活動開始時間(etc.1000)
+	`Active_Time_end`	INTEGER NOT NULL,活動終了時間
+	`Is_in_Lab`	INTEGER NOT NULL(true=1,false=0)
+);
+CREATE TABLE `Tenplate` (
+	`Template_ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`To`	INTEGER NOT NULL,誰あてへのメッセージか
+	`From`	INTEGER NOT NULL,誰が使うテンプレートか
+	`Text`	TEXT NOT NULLテンプレ内容
+);
+CREATE TABLE `Talk` (
+	`Talk_ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`To`	INTEGER NOT NULL,誰あてへのメッセージか
+	`From`	INTEGER NOT NULL,誰が送信したメッセージか
+	`Time`	TEXT NOT NULL,送信時間
+	`Text`	TEXT NOT NULL,内容
+	`Is_reserve`	INTEGER NOT NULL,送信予約であるか
+	`Read_User`	TEXT　既読ユーザのID一覧
+);
+CREATE TABLE `Grup` (
+	`Group_ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+	`Name`	TEXT NOT NULL UNIQUE,
+	`User_ID`	TEXT NOT NULL　所属ユーザのID一覧
+);
+COMMIT;

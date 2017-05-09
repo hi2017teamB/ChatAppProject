@@ -23,7 +23,7 @@ CREATE TABLE `Talk` (
 	`Is_reserve`	INTEGER NOT NULL,送信予約であるか
 	`Read_User`	TEXT　既読ユーザのID一覧
 );
-CREATE TABLE `Grup` (
+CREATE TABLE `Group` (
 	`Group_ID`	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
 	`Name`	TEXT NOT NULL UNIQUE,
 	`User_ID`	TEXT NOT NULL　所属ユーザのID一覧

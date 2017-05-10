@@ -17,11 +17,11 @@
     $.widget("ui.chatbox", {
         options: {
             id: null, //id for the DOM element
-            title: null, // title of the chatbox
+            title: "チャット", // title of the chatbox
             user: null, // can be anything associated with this chatbox
             hidden: false,
             offset: 0, // relative to right edge of the browser window
-            width: 300, // width of the chatbox
+            width: 150, // width of the chatbox
 	    messageSent: function(id, user, msg) {
                 // override this
 		    this.boxManager.addMsg(user.first_name, msg);
@@ -264,7 +264,7 @@
             this.uiChatboxInputBox.css("width", (width - 6) + "px");
         },
         _position: function(offset) {
-            this.uiChatbox.css("right", offset); //change right or left
+            this.uiChatbox.css("left", offset); //change right or left
         }
     });
 }(jQuery));

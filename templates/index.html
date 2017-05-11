@@ -3,6 +3,7 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}">
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
     <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
@@ -41,20 +42,71 @@
         $(document).ready(function() {
             $("#chat_div").chatbox(
                 {id : "chat_div",
-                 title : "Chat De Tornado",
+                 title : "name:",
                  user : "hoge",
                  offset: 0,
-                 width: 500,
+                 width: 800,
+                 left: 100,
+                 height: 100,
                  messageSent: function(id, user, msg){
                      var img_path = $('#face').attr('src');
                      this.boxManager.addMsg(img_path, msg, true);
                      sendAction(img_path, msg);
             }});
+            $("#chat_div").height(300);
         });
     </script>
 </head>
+
 <body>
-    <img src="{{ img_path }}" id="face" style="visibility:hidden">
-    <div id="chat_div" class="chat"></div>
+  <!-- コンテナ開始 -->
+<div id="container">
+
+
+<!-- ヘッダ開始 -->
+<div id="header">
+  <P><FONT size="5">メッセージアプリケーション</FONT></P>
+
+</div>
+<!-- ヘッダ終了 -->
+
+<!-- ナビゲーション開始 -->
+<div id="nav">
+
+<p><a href="tmp.html">設定</a></p>
+<p>user<br>
+<select size="10" name="user">
+<option value="選択肢1">選択肢1</option>
+<option value="選択肢2">選択肢2</option>
+<option value="選択肢3">選択肢3</option>
+</select></p>
+<p>groupe<br>
+<select size="10" name="groupe">
+<option value="選択肢1">選択肢1</option>
+<option value="選択肢2">選択肢2</option>
+<option value="選択肢3">選択肢3</option>
+</select></p>
+</div>
+<!-- ナビゲーション終了 -->
+
+<!-- メインカラム開始 -->
+<div id="content">
+［ ］
+<img src="{{ img_path }}" id="face" style="visibility:hidden">
+<div id="chat_div" class="chat"></div>
+</div>
+<!-- メインカラム終了 -->
+
+<!-- フッタ開始 -->
+<div id="footer">
+
+</div>
+<!-- フッタ終了 -->
+
+
+</div>
+<!-- コンテナ終了 -->
+
+
 </body>
 </html>

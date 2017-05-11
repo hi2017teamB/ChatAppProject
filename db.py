@@ -57,4 +57,6 @@ def get_user_from_grade(grade):
 	connector.close()
 
 
-# if __name__ == '__main__':
+
+if __name__ == '__main__':
+	None

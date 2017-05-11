@@ -40,25 +40,31 @@
         }
 
         $(document).ready(function() {
+
+          var content_off = $("#content").offset();
+          var content_width = $("#content").width();
+ var content_height = $("#content").height();
             $("#chat_div").chatbox(
                 {id : "chat_div",
-                 title : "name:",
+                 title : " ",
                  user : "hoge",
-                 offset: 0,
-                 width: 700,
-                 left: 100,
+
+                 offset: content_off.left,
+                 width: content_width-5,
                  messageSent: function(id, user, msg){
                      var img_path = $('#face').attr('src');
                      this.boxManager.addMsg(img_path, msg, true);
                      sendAction(img_path, msg);
             }});
+// var offset = $("#content").chatbox("option", "offset");
 
-              var content_off = $("#content").offset();
-              var content_width = $("#content").width();
-              var content_height = $("#nav").height();
-            $("#chat_div").offset({ top: content_off.top, left: content_off.left });
-            $("#chat_div").width(content_width);
-            $("#chat_div").height(content_height);
+
+
+            //
+            // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
+$("#chat_div").width(content_width-5);
+ $("#chat_div").height(content_height-2);
+          //  $("#chat_div").chatbox(offset, content_off-5, 500);
         });
 
     </script>
@@ -108,25 +114,14 @@ Your are log in as {{user_name}}.<br>
 
 <!-- フッタ開始 -->
 <div id="footer">
-  <div align="right">
 <a href=/auth/logout>Logout</a></div>
-</div>
+
 <!-- フッタ終了 -->
 
 
 </div>
 <!-- コンテナ終了 -->
 
-
-
-<!--
-<left>
-    Your are log in as {{user_name}}.<br>
-    <img src="{{ img_path }}" id="face" style="visibility:hidden">
-    <div align="left" id="chat_div" class="chat">hgoehd</div>
-    </left>
-    <a href=/auth/logout>Logout</a>
-    -->
 
 </body>
 </html>

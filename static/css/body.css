@@ -2,7 +2,8 @@
 
 /* --- 全体の背景・テキスト --- */
 body {
-height: 100%;
+/*width: 100vw;*/
+height: 100vh;
 margin: 0;
 padding: 0;
 background-color: #ffffff; /* ページの背景色 */
@@ -30,27 +31,28 @@ overflow:hidden;
 /* --- ヘッダ --- */
 #header {
 background-color: #ffe080; /* ヘッダの背景色 */
+height: 20vh;
 }
 
 /* --- ナビゲーション --- */
 #nav {
 float: left;
 width: 200px; /* サイドバーの幅 */
-padding-bottom: 32768px;
-margin-bottom: -32768px;
+height: 70vh;
+overflow: scroll;
 }
 
 /* --- メインカラム --- */
 #content {
 float: left;
 width: 580px; /* メインカラムの幅 */
-padding-bottom: 32768px;
-margin-bottom: -32768px;
+height: 70vh;
 }
 
 /* --- フッタ --- */
 #footer {
 clear: left; /* フロートのクリア */
-width: 100%;
+/*width: 100%;*/
+height: 10vh;
 background-color: #ffe080; /* フッタの背景色 */
 }

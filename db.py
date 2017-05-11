@@ -6,7 +6,7 @@ def get_user_id(name,passwd):
 
 	connector = sqlite3.connect("Chat.db")
 	cursor = connector.cursor()
-	cursor.execute("select User_id from User where Name = '" + name + "' and PassWord = '" + passwd +"'") 
+	cursor.execute("select User_id from User where Name = '" + name + "' and PassWord = '" + passwd +"'")
 	result = cursor.fetchall()
 
 	if(len(result) !=1):
@@ -21,7 +21,7 @@ def get_user_id(name,passwd):
 def get_user_name(user_id):
 	connector = sqlite3.connect("Chat.db")
 	cursor = connector.cursor()
-	cursor.execute("select Name from User where User_id = " + user_id) 
+	cursor.execute("select Name from User where User_id = " + user_id)
 	result = cursor.fetchall()
 
 	if(len(result) !=1):
@@ -33,6 +33,30 @@ def get_user_name(user_id):
 	cursor.close()
 	connector.close()
 
+def insert_message(to_id, from_id, time, text, is_reserve):
+	connector = sqlite3.connect("Chat.db")
+	cursor = connector.cursor()
+	cursor.execute("insert into Talk (to, from, time, text, is_reserve) values ("+to_id+","+from_id+",\""+time+"\",\""+text+"\","+is_reserve+")")
+	result = cursor.fetchall()
+
+	connector.commit()
+
+	cursor.close()
+	connector.close()
+
+def get_user_from_grade(grade):
+	connector = sqlite3.connect("Chat.db")
+	cursor = connector.cursor()
+	cursor.execute("select User_id from User where Grade = \"" + grade + "\"")
+	result = cursor.fetchall()
+
+	# print (result)
+	return str(result)
+
+	cursor.close()
+	connector.close()
+
+
 
 if __name__ == '__main__':
-	get_user_passwd("")
+	None

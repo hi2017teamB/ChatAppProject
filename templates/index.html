@@ -59,6 +59,7 @@
 </head>
 
 <body>
+
   <!-- コンテナ開始 -->
 <div id="container">
 
@@ -91,9 +92,10 @@
 
 <!-- メインカラム開始 -->
 <div id="content">
-［ ］
+Your are log in as {{user_name}}.<br>
 <img src="{{ img_path }}" id="face" style="visibility:hidden">
 <div id="chat_div" class="chat"></div>
+<a href=/auth/logout>Logout</a>
 </div>
 <!-- メインカラム終了 -->
 
@@ -107,6 +109,16 @@
 </div>
 <!-- コンテナ終了 -->
 
+
+
+<!--
+<left>
+    Your are log in as {{user_name}}.<br>
+    <img src="{{ img_path }}" id="face" style="visibility:hidden">
+    <div align="left" id="chat_div" class="chat">hgoehd</div>
+    </left>
+    <a href=/auth/logout>Logout</a>
+    -->
 
 </body>
 </html>

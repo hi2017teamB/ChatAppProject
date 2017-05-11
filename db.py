@@ -36,7 +36,10 @@ def get_user_name(user_id):
 def insert_message(to_id, from_id, time, text, is_reserve):
 	connector = sqlite3.connect("Chat.db")
 	cursor = connector.cursor()
-	cursor.execute("insert into Talk (to, from, time, text, is_reserve) values ("+to_id+","+from_id+",\""+time+"\",\""+text+"\","+is_reserve+")")
+	cursor.execute("insert into Talk (\'to\', \'from\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
+	# cursor.execute("insert into Talk (to, from, time, text, is_reserve) values ("+to_id+","+from_id+",\""+time+"\",\""+text+"\","+is_reserve+")")
+	# cursor.execute("insert into talk(to, from, time, text, is_reserve) values(5, 5, \'19950204\', \'ゴミ捨て\', 1)")
+	# cursor.execute("insert into Talk(From) values(5)")
 	result = cursor.fetchall()
 
 	connector.commit()
@@ -50,8 +53,7 @@ def get_user_from_grade(grade):
 	cursor.execute("select User_id from User where Grade = \"" + grade + "\"")
 	result = cursor.fetchall()
 
-	# print (result)
-	return str(result)
+	return result
 
 	cursor.close()
 	connector.close()

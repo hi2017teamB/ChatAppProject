@@ -18,7 +18,7 @@ define("username", default="user")
 define("password", default="pass")
 
 class MainHandler(tornado.web.RequestHandler):
-    print("Hi2")
+    # print("Hi2")
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         #self.write("Hello, <b>" + self.get_current_user() + "</b> <br> <a href=/auth/logout>Logout</a>")
@@ -66,7 +66,7 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_current_user(self, username):
         print("set_current_user")
-        self.set_cookie(self.cookie_username, tornado.escape.utf8(username))
+        self.set_secure_cookie(self.cookie_username, tornado.escape.utf8(username))
 
     def clear_current_user(self):
         self.clear_cookie(self.cookie_username)
@@ -78,9 +78,9 @@ class AuthLoginHandler(BaseHandler):
         self.render("login.html")
 
     def post(self):
-        # logging.debug("xsrf_cookie:" + self.get_argument("_xsrf", None))
+        logging.debug("xsrf_cookie:" + self.get_argument("_xsrf", None))
 
-        # self.check_xsrf_cookie()
+        self.check_xsrf_cookie()
 
         username = self.get_argument("username")
         password = self.get_argument("password")
@@ -90,7 +90,7 @@ class AuthLoginHandler(BaseHandler):
         if user_id!=None:
             print(username)
             self.set_current_user(user_id)
-            print(username)
+            print(user_id)
             self.redirect('/')
         else:
             self.render("login_error.html")
@@ -99,8 +99,8 @@ class AuthLoginHandler(BaseHandler):
 class AuthLogoutHandler(BaseHandler):
 
     def get(self):
-        #self.clear_current_user()
-        self.redirect('/chat')
+        self.clear_current_user()
+        self.redirect('/')
 
 
 class Application(tornado.web.Application):
@@ -117,8 +117,8 @@ class Application(tornado.web.Application):
         	template_path = os.path.join(BASE_DIR, 'templates'),
             static_path = os.path.join(BASE_DIR, 'static'),
             login_url = "/auth/login",
-            xsrf_cookies = False,
-            # cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
+            xsrf_cookies = True,
+            cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
             autoescape="xhtml_escape",
             debug=True,
         )
@@ -126,6 +126,7 @@ class Application(tornado.web.Application):
 
 if __name__ == '__main__':
     app = Application()
+    # app.listen(8009)
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(8008)
     tornado.ioloop.IOLoop.instance().start()

@@ -24,6 +24,7 @@ define("username", default="user")
 define("password", default="pass")
 
 
+
 class Application(tornado.web.Application):
 
     def __init__(self):
@@ -103,7 +104,6 @@ class AuthLogoutHandler(BaseHandler):
 
 
 class ChatHandler(tornado.websocket.WebSocketHandler):
-
     waiters = set()
     messages = []
     def get(self, *args, **kwargs):
@@ -127,6 +127,7 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         self.waiters.remove(self)
 
+
 def main():
     tornado.options.parse_config_file(os.path.join(os.path.dirname(__file__), 'server.conf'))
     tornado.options.parse_command_line()
@@ -137,5 +138,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

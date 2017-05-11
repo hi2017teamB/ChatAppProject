@@ -47,3 +47,4 @@ def insert_message(to_id, from_id, time, text, is_reserve):
 
 
 if __name__ == '__main__':
+	None

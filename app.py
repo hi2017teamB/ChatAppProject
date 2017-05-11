@@ -1,41 +1,116 @@
-import os
-import logging
+# -*- coding: utf-8 -*-
+
+'''
+    User: ogata
+    Date: 5/31/12
+    Time: 2:10 PM
+'''
+__author__ = 'ogata'
 import json
 import random
-import tornado.httpserver
 import tornado.ioloop
 import tornado.web
-import tornado.websocket
-from tornado.web import url
 import tornado.escape
 import tornado.options
 from tornado.options import define, options
-
+import tornado.websocket
+from tornado.web import url
+import os
+import logging
 import db
 
-
+define("port", default=5000, type=int)
 define("username", default="user")
 define("password", default="pass")
 
-class MainHandler(tornado.web.RequestHandler):
-    print("Hi2")
+
+class Application(tornado.web.Application):
+
+    def __init__(self):
+        handlers = [
+            (r'/', MainHandler),
+            (r'/auth/login', AuthLoginHandler),
+            (r'/auth/logout', AuthLogoutHandler),
+            (r'/chat', ChatHandler),
+        ]
+        settings = dict(
+            cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
+            static_path=os.path.join(os.path.dirname(__file__), "static"),
+            template_path=os.path.join(os.path.dirname(__file__), "templates"),
+            login_url="/auth/login",
+            xsrf_cookies=True,
+            autoescape="xhtml_escape",
+            debug=True,
+            )
+        tornado.web.Application.__init__(self, handlers, **settings)
+
+class BaseHandler(tornado.web.RequestHandler):
+
+    cookie_username = "username"
+
+    def get_current_user(self):
+        username = self.get_secure_cookie(self.cookie_username)
+        logging.debug('BaseHandler - username: %s' % username)
+        if not username: return None
+        return tornado.escape.utf8(username)
+
+    def set_current_user(self, username):
+        self.set_secure_cookie(self.cookie_username, tornado.escape.utf8(username))
+
+    def clear_current_user(self):
+        self.clear_cookie(self.cookie_username)
+
+
+class MainHandler(BaseHandler):
+
     @tornado.web.authenticated
-    def get(self, *args, **kwargs):
-        #self.write("Hello, <b>" + self.get_current_user() + "</b> <br> <a href=/auth/logout>Logout</a>")
-        print("Hi")
-        print(self.get_current_user())
-        self.redirect('/chat')
+    def get(self):
+        #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
+        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+        img_name = random.choice(face_pics)
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()))
+
+
+class AuthLoginHandler(BaseHandler):
+
+    def get(self):
+        self.render("login.html")
+
+    def post(self):
+        logging.debug("xsrf_cookie:" + self.get_argument("_xsrf", None))
+
+        self.check_xsrf_cookie()
+
+        username = self.get_argument("username")
+        password = self.get_argument("password")
+
+        logging.debug('AuthLoginHandler:post %s %s' % (username, password))
+        user_id = db.get_user_id(username,password)
+        if user_id!=None:
+            print(username)
+            self.set_current_user(username)
+            print(username)
+            self.redirect('/')
+        else:
+            self.render("login_error.html")
+
+
+class AuthLogoutHandler(BaseHandler):
+
+    def get(self):
+        self.clear_current_user()
+        self.redirect('/')
 
 
 class ChatHandler(tornado.websocket.WebSocketHandler):
 
     waiters = set()
     messages = []
-    @tornado.web.authenticated
     def get(self, *args, **kwargs):
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
-        self.render('index.html', img_path=self.static_url('images/' + img_name))
+        self.render('index.html', img_path=self.static_url('images/' + img_name),username=str(self.get_current_user()))
+
 
     def open(self, *args, **kwargs):
         self.waiters.add(self)
@@ -52,80 +127,15 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         self.waiters.remove(self)
 
-
-
-class BaseHandler(tornado.web.RequestHandler):
-    print("BaseHandler")
-    cookie_username = "username"
-
-    def get_current_user(self):
-        username = self.get_cookie(self.cookie_username)
-        logging.debug('BaseHandler - username: %s' % username)
-        if not username: return None
-        return tornado.escape.utf8(username)
-
-    def set_current_user(self, username):
-        print("set_current_user")
-        self.set_cookie(self.cookie_username, tornado.escape.utf8(username))
-
-    def clear_current_user(self):
-        self.clear_cookie(self.cookie_username)
-
-
-class AuthLoginHandler(BaseHandler):
-
-    def get(self):
-        self.render("login.html")
-
-    def post(self):
-        # logging.debug("xsrf_cookie:" + self.get_argument("_xsrf", None))
-
-        # self.check_xsrf_cookie()
-
-        username = self.get_argument("username")
-        password = self.get_argument("password")
-
-        logging.debug('AuthLoginHandler:post %s %s' % (username, password))
-        user_id = db.get_user_id(username,password)
-        if user_id!=None:
-            print(username)
-            self.set_current_user(user_id)
-            print(username)
-            self.redirect('/')
-        else:
-            self.render("login_error.html")
-
-
-class AuthLogoutHandler(BaseHandler):
-
-    def get(self):
-        #self.clear_current_user()
-        self.redirect('/chat')
-
-
-class Application(tornado.web.Application):
-
-    def __init__(self):
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        handlers = [
-        	url(r'/', MainHandler, name='index'),
-            url(r'/chat', ChatHandler, name='chat'),
-            url(r'/auth/login', AuthLoginHandler),
-            url(r'/auth/logout', AuthLogoutHandler),
-        ]
-        setting = dict(
-        	template_path = os.path.join(BASE_DIR, 'templates'),
-            static_path = os.path.join(BASE_DIR, 'static'),
-            login_url = "/auth/login",
-            xsrf_cookies = False,
-            # cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
-            autoescape="xhtml_escape",
-            debug=True,
-        )
-        tornado.web.Application.__init__(self, handlers, **setting)
-
-if __name__ == '__main__':
+def main():
+    tornado.options.parse_config_file(os.path.join(os.path.dirname(__file__), 'server.conf'))
+    tornado.options.parse_command_line()
     app = Application()
-    http_server = tornado.httpserver.HTTPServer(app)
-    http_server.listen(8008)
+    app.listen(options.port)
+    logging.debug('run on port %d in %s mode' % (options.port, options.logging))
     tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == "__main__":
+    main()
+
+

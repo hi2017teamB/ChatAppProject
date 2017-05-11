@@ -83,15 +83,15 @@ Your are log in as {{user_name}}.<br>
 <p><a href="tmp.html">設定</a></p>
 <p>user<br>
 <select size="10" name="user">
-<option value="選択肢1">選択肢1</option>
-<option value="選択肢2">選択肢2</option>
-<option value="選択肢3">選択肢3</option>
+{% for user in user_list %}
+<option value={{user[0]}}>{{user[0]}}</option>
+{% end %}
 </select></p>
 <p>groupe<br>
 <select size="10" name="groupe">
-<option value="選択肢1">選択肢1</option>
-<option value="選択肢2">選択肢2</option>
-<option value="選択肢3">選択肢3</option>
+{% for group in group_list %}
+<option value={{group[0]}}>{{group[0]}}</option>
+{% end %}
 </select></p>
 </div>
 <!-- ナビゲーション終了 -->

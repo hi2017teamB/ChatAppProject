@@ -14,7 +14,7 @@ def get_user_list():
 def get_group_list():
 	connector = sqlite3.connect("Chat.db")
 	cursor = connector.cursor()
-	cursor.execute("select Name from GroupTable")
+	cursor.execute("select Name from \'Group\'")
 	result = cursor.fetchall()
 	cursor.close()
 	connector.close()

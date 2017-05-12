@@ -3,10 +3,11 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
     <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
+
 
     <script>
         var socket = new WebSocket('ws://' + location.host + '/chat');
@@ -50,7 +51,7 @@
                  user : "hoge",
 
                  offset: content_off.left,
-                 width: content_width-5,
+                 width: content_width-40,
                  messageSent: function(id, user, msg){
                      var img_path = $('#face').attr('src');
                      this.boxManager.addMsg(img_path, msg, true);
@@ -62,39 +63,95 @@
 
             //
             // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
-$("#chat_div").width(content_width-5);
+$("#chat_div").width(content_width-40);
  $("#chat_div").height(content_height-2);
           //  $("#chat_div").chatbox(offset, content_off-5, 500);
         });
+        $(function() {
+          // 候補リストに表示するデータを配列で準備
+          var data = [
+            'accepts',
+            'action_name',
+            'add',
+            'add_column',
+            'add_index',
+            'add_timestamps',
+            'after_create',
+            'after_destroy',
+            'after_filter',
+            'all',
+          ];
+
+          // オートコンプリート機能を適用
+          $('#txtKeywd').autocomplete({
+            source: data,
+            // autoFocus: true,
+            // delay: 500,
+            // minLength: 2
+          });
+        });
+
 
     </script>
 </head>
 
 <body>
 
+
+
   <!-- コンテナ開始 -->
 <div id="container">
 
 
 <!-- ヘッダ開始 -->
+
 <div id="header">
-  <P><FONT size="5">メッセージアプリケーション</FONT></P>
-Your are log in as {{user_name}}.<br>
+
+  <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
+  <br>
+You are log in as {{user_name}}.<br>
+
+
+<!-- Autocomplete -->
+
+<div Align="right">
+  <div role="main" class="ui-content">
+    <form method="POST" action="">
+      <div class="ui-field-contain">
+       <label for="entry_book">template：</label>
+       <select id="entry_book" name="entry_book">
+         <option value="otu">お疲れ様です</option>
+         <option value="hello">こんにちは</option>
+       </select>
+     </div>
+    </form><button id="button">挿入</button>
+  </div>
+
+
+
+
+</div>
 </div>
 <!-- ヘッダ終了 -->
 
 <!-- ナビゲーション開始 -->
 <div id="nav">
 
-<p><a href="tmp.html">設定</a></p>
-<p>user<br>
-<select size="10" name="user">
+<form action="#">
+<input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
+</form>
+
+
+<font size="5"><p>User<br>
+<select size="10" name="User" style="width: 150px">
 {% for user in user_list %}
 <option value={{user[0]}}>{{user[0]}}</option>
 {% end %}
-</select></p>
-<p>groupe<br>
-<select size="10" name="groupe">
+</select>
+</font></p>
+<FONT size="5"><p>Group<br></FONT>
+
+<select size="10" name="Group" style="width: 150px">
 {% for group in group_list %}
 <option value={{group[0]}}>{{group[0]}}</option>
 {% end %}
@@ -114,8 +171,10 @@ Your are log in as {{user_name}}.<br>
 
 <!-- フッタ開始 -->
 <div id="footer">
-<a href=/auth/logout>Logout</a></div>
-
+<a href=/auth/logout>Logout</a>
+<div Align="right">
+<button id="button">送<br>信</button>
+</div></div>
 <!-- フッタ終了 -->
 
 

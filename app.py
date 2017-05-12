@@ -32,6 +32,7 @@ class Application(tornado.web.Application):
             (r'/', MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
+            (r'/setting',SettingHandler),
             (r'/chat', ChatHandler),
         ]
         settings = dict(
@@ -61,6 +62,9 @@ class BaseHandler(tornado.web.RequestHandler):
     def clear_current_user(self):
         self.clear_cookie(self.cookie_username)
 
+class SettingHandler(BaseHandler):
+    def get(self):
+        self.render("setting_window.html")
 
 class MainHandler(BaseHandler):
 

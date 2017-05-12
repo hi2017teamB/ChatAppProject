@@ -2,6 +2,26 @@
 import sqlite3
 
 
+def get_user_list():
+	connector = sqlite3.connect("Chat.db")
+	cursor = connector.cursor()
+	cursor.execute("select Name from User")
+	result = cursor.fetchall()
+	cursor.close()
+	connector.close()
+	return result
+
+def get_group_list():
+	connector = sqlite3.connect("Chat.db")
+	cursor = connector.cursor()
+	cursor.execute("select Name from GroupTable")
+	result = cursor.fetchall()
+	cursor.close()
+	connector.close()
+	return result
+
+
+
 def get_user_id(name,passwd):
 
 	connector = sqlite3.connect("Chat.db")

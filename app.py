@@ -69,7 +69,7 @@ class MainHandler(BaseHandler):
         #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=self.get_current_user(),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 
 class AuthLoginHandler(BaseHandler):
@@ -89,7 +89,7 @@ class AuthLoginHandler(BaseHandler):
         user_id = db.get_user_id(username,password)
         if user_id!=None:
             print(username)
-            self.set_current_user(username)
+            self.set_current_user(str(username))
             print(username)
             self.redirect('/')
         else:
@@ -106,15 +106,18 @@ class AuthLogoutHandler(BaseHandler):
 class ChatHandler(tornado.websocket.WebSocketHandler):
     waiters = set()
     messages = []
-    def get(self, *args, **kwargs):
-        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
-        img_name = random.choice(face_pics)
-        self.render('index.html', img_path=self.static_url('images/' + img_name),username=str(self.get_current_user()))
+    user_list = []
+    #def get(self, *args, **kwargs):
+    #    face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+    #    img_name = random.choice(face_pics)
+    #   self.render('index.html', img_path=self.static_url('images/' + img_name),username=str(self.get_current_user()))
 
 
     def open(self, *args, **kwargs):
+        self.user_list.append([self.get_current_user(),self])
         self.waiters.add(self)
         self.write_message({'messages': self.messages})
+        print(self.user_list)
 
     def on_message(self, message):
         message = json.loads(message)
@@ -123,6 +126,7 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
             if waiter == self:
                 continue
             waiter.write_message({'img_path': message['img_path'], 'message': message['message']})
+            #db.insert_massage(get_current_user(),massage['message'])
 
     def on_close(self):
         self.waiters.remove(self)

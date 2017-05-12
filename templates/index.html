@@ -67,29 +67,7 @@ $("#chat_div").width(content_width-40);
  $("#chat_div").height(content_height-2);
           //  $("#chat_div").chatbox(offset, content_off-5, 500);
         });
-        $(function() {
-          // 候補リストに表示するデータを配列で準備
-          var data = [
-            'accepts',
-            'action_name',
-            'add',
-            'add_column',
-            'add_index',
-            'add_timestamps',
-            'after_create',
-            'after_destroy',
-            'after_filter',
-            'all',
-          ];
 
-          // オートコンプリート機能を適用
-          $('#txtKeywd').autocomplete({
-            source: data,
-            // autoFocus: true,
-            // delay: 500,
-            // minLength: 2
-          });
-        });
 
 
     </script>

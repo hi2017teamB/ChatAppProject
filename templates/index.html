@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}">
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="{{ static_url('js/index.js') }}"></script>
     <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
 
     <script>
@@ -88,11 +89,13 @@ Your are log in as {{user_name}}.<br>
 
 <p><a href="tmp.html">設定</a></p>
 <p>user<br>
-<select size="10" name="user">
+<form name="test">
+<select size="10" name="user" onChange="redirect_user_mag()">
 {% for user in user_list %}
-<option value={{user[0]}}>{{user[0]}}</option>
+<option value="./chat?request_user={{user[0]}}">{{user[0]}}</option>
 {% end %}
-</select></p>
+</select>
+</form></p>
 <p>groupe<br>
 <select size="10" name="groupe">
 {% for group in group_list %}

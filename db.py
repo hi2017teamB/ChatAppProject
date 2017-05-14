@@ -40,9 +40,13 @@ def get_user_from_grade(grade):
 def get_all_from_bot():
 	result = execute_sql("select * from bot;")
 	return result
+
 def get_is_in_lab(user_id):
 	result = execute_sql("select Is_in_Lab from User where User_id = " + user_id)
 	return result
+
+def change_flag(bot_id, flag):
+	result = execute_sql("update bot set Flag = " + str(flag) + " where Bot_id = " + str(bot_id))
 
 def execute_sql(sql):
 	print(sql)

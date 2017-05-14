@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sqlite3
-
+BOT_ID = 5
 #SQL文を実行する場合はself.execute_sql(sql)を呼ぶこと
 
 def get_user_list():
@@ -47,6 +47,14 @@ def get_is_in_lab(user_id):
 
 def change_flag(bot_id, flag):
 	result = execute_sql("update bot set Flag = " + str(flag) + " where Bot_id = " + str(bot_id))
+	return
+
+def get_unread_message_for_bot():
+	result = execute_sql("select Text from Talk where Talk.'To' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	# a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	return result
+
+
 
 def execute_sql(sql):
 	print(sql)

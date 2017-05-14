@@ -3,8 +3,7 @@ import time
 from datetime import datetime
 from datetime import date
 import os
-
-BOT_ID = 5
+import re
 
 def gomisute():
     result = db.get_user_from_grade("b4")
@@ -44,14 +43,30 @@ def match_schedule(r):
 
     return flag
 
+def enter_schedule():
+    messages = db.get_unread_message_for_bot()
+    for message in messages:
+        find_datetime(message[0])
+    print(messages)
+
+def find_datetime(message):
+    pattern = "^毎月[1-9]{1,2}日に(\S*)をリマインド"
+    match = re.search(pattern , message)
+    if match:
+        print(match.group(1))
+    else:
+        print("matchFailed")
+
+
 if __name__ == '__main__':
     while True:
         print (datetime.now().strftime('%Y/%m/%d %H:%M:%S'));
         # スケジュール登録メッセージを取得
+        enter_schedule()
 
         # 送信スケジュールを取得
         results = db.get_all_from_bot()
-        print (results)
+        # print (results)
         for result in results:
             if(match_schedule(result) == True):
                 if(result[7] == 1):
@@ -83,7 +98,8 @@ if __name__ == '__main__':
                     db.change_flag(result[0], 0)
 
             else:
-                db.change_flag(result[0], 1)
+                if(result[7] == 0):
+                    db.change_flag(result[0], 1)
                 print("failed")
         # print (datetime.now().weekday())
 

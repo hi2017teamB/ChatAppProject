@@ -37,6 +37,13 @@ def get_user_from_grade(grade):
 	result = execute_sql("select User_id from User where Grade = \"" + grade + "\"")
 	return result
 
+def get_all_from_bot():
+	result = execute_sql("select * from bot;")
+	return result
+def get_is_in_lab(user_id):
+	result = execute_sql("select Is_in_Lab from User where User_id = " + user_id)
+	return result
+
 def execute_sql(sql):
 	print(sql)
 	connector = sqlite3.connect("Chat.db")
@@ -44,6 +51,7 @@ def execute_sql(sql):
 	cursor.execute(sql)
 	result = cursor.fetchall()
 	cursor.close()
+	connector.commit()
 	connector.close()
 	return result
 

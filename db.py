@@ -27,7 +27,7 @@ def get_user_id(name,passwd):
 		print(str(result[0][0]))
 		return str(result[0][0])
 
-def get_user_id(name):
+def get_user_id_from_name(name):
 	result = execute_sql("select User_id from User where Name = '" + name+"'")
 	if(len(result) !=1):
 		print("not found")

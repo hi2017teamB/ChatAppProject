@@ -5,6 +5,9 @@ from datetime import datetime
 BOT_ID = 5
 
 
+def get_message(to_id,from_id):
+	return execute_sql("select * from talk where (To_id = "+to_id+" and From_id="+from_id+") or (To_id ="+from_id+" and From_id ="+to_id+") order by Talk_ID")
+
 
 def get_now_time():
 	return datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
@@ -24,6 +27,16 @@ def get_user_id(name,passwd):
 		print(str(result[0][0]))
 		return str(result[0][0])
 
+def get_user_id(name):
+	result = execute_sql("select User_id from User where Name = '" + name+"'")
+	if(len(result) !=1):
+		print("not found")
+		return None
+	else:
+		print(str(result[0][0]))
+		return str(result[0][0])
+
+
 def get_user_name(user_id):
 	result = execute_sql("select Name from User where User_id = " + user_id)
 
@@ -36,7 +49,7 @@ def get_user_name(user_id):
 
 
 def insert_message(to_id, from_id, time, text, is_reserve):
-	execute_sql("insert into Talk (\'to\', \'from\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
+	execute_sql("insert into Talk (\'to_id\', \'from_id\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
 	return
 
 def get_user_from_grade(grade):
@@ -56,7 +69,7 @@ def change_flag(bot_id, flag):
 	return
 
 def get_unread_message_for_bot():
-	result = execute_sql("select Text from Talk where Talk.'To' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	result = execute_sql("select Text from Talk where Talk.'To_id' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
 	# a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 

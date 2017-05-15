@@ -23,9 +23,7 @@ define("port", default=5000, type=int)
 define("username", default="user")
 define("password", default="pass")
 
-send_to = 'bot'
-
-
+global to_user
 
 class Application(tornado.web.Application):
 
@@ -34,7 +32,7 @@ class Application(tornado.web.Application):
             (r'/', MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
-            (r'/chat/', ChatHandler),
+            (r'/chat/*', ChatHandler),
             (r'/chats*',MainHandler),
         ]
         settings = dict(
@@ -56,7 +54,7 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
         username = self.get_secure_cookie(self.cookie_username)
         logging.debug('BaseHandler - username: %s' % username)
         if not username: return None
-        return tornado.escape.utf8(username)
+        return tornado.escape.utf8(username).decode('utf-8')
 
     def set_current_user(self, username):
         self.set_secure_cookie(self.cookie_username, tornado.escape.utf8(username))
@@ -65,14 +63,20 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
         self.clear_cookie(self.cookie_username)
 
 
-# class MainHandler(BaseHandler):
+class MainHandler(BaseHandler):
 
-#     @tornado.web.authenticated
-#     def get(self):
-#         #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
-#         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
-#         img_name = random.choice(face_pics)
-#         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=self.get_current_user(),user_list=db.get_user_list(),group_list=db.get_group_list())
+    @tornado.web.authenticated
+    def get(self, *args, **kwargs):
+        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+        img_name = random.choice(face_pics)
+        global to_user
+        try:
+            print(self.get_argument("request_user"))
+            self.write("request message is "+self.get_argument("request_user"))
+            to_user=self.get_argument("request_user")
+        except:
+            to_user = 'bot'
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 
 class AuthLoginHandler(BaseHandler):
@@ -104,46 +108,33 @@ class AuthLogoutHandler(BaseHandler):
         self.redirect('/')
 
 
-class MainHandler(BaseHandler):
-    @tornado.web.authenticated
-    def get(self, *args, **kwargs):
-        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
-        img_name = random.choice(face_pics)
-        try:
-            print(self.get_argument("request_user"))
-            self.write("request message is "+self.get_argument("request_user"))
-            send_to = self.get_argument("request_user")
-        except:
-            self.write("request user is not find.")
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
-
-
 class ChatHandler(BaseHandler):
     waiters = set()
     messages = []
-    user_list = []
+    global to_user
 
-    def open(self, *args, **kwargs):
+    def open(self, *args, **kwargs):#初期メッセージ送信
         print("open")
         print(self)
-        self.user_list.append([self.get_current_user(),self])
-
         self.waiters.add(self)
+        self.messages=[]
+        for message in db.get_message(db.get_user_id(to_user),db.get_user_id(self.get_current_user())):
+            #print(message)
+            self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
         self.write_message({'messages': self.messages})
-        print(self.user_list)
 
-    def on_message(self, message):
+    def on_message(self, message):#メーッセージ受信およびブロードキャスト
         message = json.loads(message)
         print("on_message")
         print(message)
-        self.messages.append(message)
+        print(self.get_current_user())
+        db.insert_message(db.get_user_id(to_user), db.get_user_id(self.get_current_user()), db.get_now_time(),message['message'], 0)
+        #self.messages.append(message)
 
         for waiter in self.waiters:
             if waiter == self:
-                None
-            #    continue
+               continue
             waiter.write_message({'img_path': message['img_path'], 'message': message['message']})
-            #db.insert_massage(get_current_user(),massage['message'])
 
     def on_close(self):
         self.waiters.remove(self)

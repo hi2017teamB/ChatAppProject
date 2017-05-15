@@ -96,7 +96,7 @@ def find_datetime(message):
         return
 
     pattern = "^(?P<time>\S*)に(?P<item>\S*)をリマインド$"
-    match re.search(pattern, other)
+    match = re.search(pattern, other)
 
     # pattern = "^毎月(?P<day>(([0-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))+)に(?P<item>\S*)をリマインド"
     # # pattern = "^毎月([0-9]{1,2}日)([1-9]{1,2}日)に(?P<item>\S*)をリマインド"

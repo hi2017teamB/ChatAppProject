@@ -118,7 +118,7 @@ class ChatHandler(BaseHandler):
         print(self)
         self.waiters.add(self)
         self.messages=[]
-        for message in db.get_message(db.get_user_id(to_user),db.get_user_id(self.get_current_user())):
+        for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
             #print(message)
             self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
         self.write_message({'messages': self.messages})
@@ -128,7 +128,7 @@ class ChatHandler(BaseHandler):
         print("on_message")
         print(message)
         print(self.get_current_user())
-        db.insert_message(db.get_user_id(to_user), db.get_user_id(self.get_current_user()), db.get_now_time(),message['message'], 0)
+        db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
         #self.messages.append(message)
 
         for waiter in self.waiters:

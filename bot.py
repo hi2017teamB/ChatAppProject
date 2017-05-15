@@ -51,18 +51,18 @@ def enter_schedule():
 
 def find_datetime(message):
     print(message)
-    # pattern = "^毎月(?P<day>([1-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))*に(?P<item>\S*)をリマインド"
-    pattern = "^毎月([1-9]{1,2}日)([1-9]{1,2}日)に(?P<item>\S*)をリマインド"
+    pattern = "^((次の)|(毎(週|月)))(?P<day>(([0-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))+)に(?P<item>\S*)をリマインド"
+    # pattern = "^毎月([0-9]{1,2}日)([1-9]{1,2}日)に(?P<item>\S*)をリマインド"
     match = re.search(pattern , message)
     if match:
         print("毎月")
-        # print(match.group("day"))
+        print(match.group("day"))
         print(match.group("item"))
     else:
         # print("matchFailed")
         None
 
-    pattern = "^毎週(?P<day>[日月火水木金土]曜[日]?)+に(?P<item>\S*)をリマインド"
+    pattern = "^毎週(?P<day>([日月火水木金土]曜[日]?)+)に(?P<item>\S*)をリマインド"
     match = re.search(pattern , message)
     if match:
         print("毎週")
@@ -71,6 +71,18 @@ def find_datetime(message):
     else:
         # print("matchFailed")
         None
+
+    pattern = "^次の(?P<day>(([0-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))+)に(?P<item>\S*)をリマインド"
+    match = re.search(pattern , message)
+    if match:
+        print("一回だけ")
+        print(match.group("day"))
+        print(match.group("item"))
+    else:
+        # print("matchFailed")
+        None
+
+
 
 
 if __name__ == '__main__':

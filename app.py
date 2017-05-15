@@ -23,16 +23,19 @@ define("port", default=5000, type=int)
 define("username", default="user")
 define("password", default="pass")
 
+send_to = 'bot'
+
 
 
 class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r'/', ChatHandler),
+            (r'/', MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
-            (r'/chat/*', ChatHandler),
+            (r'/chat/', ChatHandler),
+            (r'/chats*',MainHandler),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -101,11 +104,7 @@ class AuthLogoutHandler(BaseHandler):
         self.redirect('/')
 
 
-class ChatHandler(BaseHandler):
-    waiters = set()
-    messages = []
-    user_list = []
-
+class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
@@ -113,10 +112,16 @@ class ChatHandler(BaseHandler):
         try:
             print(self.get_argument("request_user"))
             self.write("request message is "+self.get_argument("request_user"))
+            send_to = self.get_argument("request_user")
         except:
-            None
+            self.write("request user is not find.")
         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
 
+
+class ChatHandler(BaseHandler):
+    waiters = set()
+    messages = []
+    user_list = []
 
     def open(self, *args, **kwargs):
         print("open")

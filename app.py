@@ -29,7 +29,7 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r'/', MainHandler),
+            (r'/', ChatHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
             (r'/chat/*', ChatHandler),
@@ -62,14 +62,14 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
         self.clear_cookie(self.cookie_username)
 
 
-class MainHandler(BaseHandler):
+# class MainHandler(BaseHandler):
 
-    @tornado.web.authenticated
-    def get(self):
-        #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
-        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
-        img_name = random.choice(face_pics)
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=self.get_current_user(),user_list=db.get_user_list(),group_list=db.get_group_list())
+#     @tornado.web.authenticated
+#     def get(self):
+#         #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
+#         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+#         img_name = random.choice(face_pics)
+#         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=self.get_current_user(),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 
 class AuthLoginHandler(BaseHandler):
@@ -105,11 +105,16 @@ class ChatHandler(BaseHandler):
     waiters = set()
     messages = []
     user_list = []
+
+    @tornado.web.authenticated
     def get(self, *args, **kwargs):
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
-        print(self.get_argument("request_user"))
-        self.write("request message is "+self.get_argument("request_user"))
+        try:
+            print(self.get_argument("request_user"))
+            self.write("request message is "+self.get_argument("request_user"))
+        except:
+            None
         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 

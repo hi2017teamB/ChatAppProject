@@ -50,12 +50,27 @@ def enter_schedule():
     print(messages)
 
 def find_datetime(message):
-    pattern = "^毎月[1-9]{1,2}日に(\S*)をリマインド"
+    print(message)
+    # pattern = "^毎月(?P<day>([1-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))*に(?P<item>\S*)をリマインド"
+    pattern = "^毎月([1-9]{1,2}日)([1-9]{1,2}日)に(?P<item>\S*)をリマインド"
     match = re.search(pattern , message)
     if match:
-        print(match.group(1))
+        print("毎月")
+        # print(match.group("day"))
+        print(match.group("item"))
     else:
-        print("matchFailed")
+        # print("matchFailed")
+        None
+
+    pattern = "^毎週(?P<day>[日月火水木金土]曜[日]?)+に(?P<item>\S*)をリマインド"
+    match = re.search(pattern , message)
+    if match:
+        print("毎週")
+        print(match.group("day"))
+        print(match.group("item"))
+    else:
+        # print("matchFailed")
+        None
 
 
 if __name__ == '__main__':

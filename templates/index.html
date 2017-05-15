@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="{{ static_url('js/index.js') }}"></script>
     <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
 
 
@@ -115,21 +116,29 @@ You are log in as {{user_name}}.<br>
 <!-- ナビゲーション開始 -->
 <div id="nav">
 
+<<<<<<< HEAD
 <form action="#">
 <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
 </form>
 
 
 <font size="5"><p>User<br>
-<select size="10" name="User" style="width: 150px">
+<select size="10" name="User" style="width: 150px " onChange="redirect_user_mag()">
+<form name="test">
+
+
 {% for user in user_list %}
-<option value={{user[0]}}>{{user[0]}}</option>
+<option value="./chat?request_user={{user[0]}}">{{user[0]}}</option>
 {% end %}
 </select>
+
 </font></p>
+</form></p>
 <FONT size="5"><p>Group<br></FONT>
 
 <select size="10" name="Group" style="width: 150px">
+
+
 {% for group in group_list %}
 <option value={{group[0]}}>{{group[0]}}</option>
 {% end %}

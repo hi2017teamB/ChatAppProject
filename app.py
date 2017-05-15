@@ -45,8 +45,8 @@ class Application(tornado.web.Application):
             )
         tornado.web.Application.__init__(self, handlers, **settings)
 
-class BaseHandler(tornado.web.RequestHandler):
-
+class BaseHandler(tornado.websocket.WebSocketHandler):
+    #tornado.web.RequestHandler,
     cookie_username = "username"
 
     def get_current_user(self):
@@ -101,9 +101,10 @@ class AuthLogoutHandler(BaseHandler):
         self.redirect('/')
 
 
-class ChatHandler(tornado.websocket.WebSocketHandler):
+class ChatHandler(BaseHandler):
     waiters = set()
     messages = []
+
     def get(self, *args, **kwargs):
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
@@ -113,15 +114,21 @@ class ChatHandler(tornado.websocket.WebSocketHandler):
 
 
     def open(self, *args, **kwargs):
+        print("open")
+        print(self)
         self.waiters.add(self)
         self.write_message({'messages': self.messages})
 
     def on_message(self, message):
         message = json.loads(message)
+        print("on_message")
+        print(message)
         self.messages.append(message)
+
         for waiter in self.waiters:
             if waiter == self:
-                continue
+                None
+            #    continue
             waiter.write_message({'img_path': message['img_path'], 'message': message['message']})
 
     def on_close(self):

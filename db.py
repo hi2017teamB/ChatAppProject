@@ -16,7 +16,7 @@ def get_user_list():
 	return execute_sql("select Name from User")
 
 def get_group_list():
-	return execute_sql("select Name from \'Group\'")
+	return execute_sql("select Name from \'Group_Info\'")
 
 def get_user_id(name,passwd):
 	result = execute_sql("select User_id from User where Name = '" + name + "' and PassWord = '" + passwd +"'")

@@ -123,17 +123,16 @@ You are log in as {{user_name}}.<br>
 
 
 <font size="5"><p>User<br>
-<select size="10" name="User" style="width: 150px " onChange="redirect_user_mag()">
 <form name="test">
-
-
+<select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
 {% for user in user_list %}
 <option value="./chats?request_user={{user[0]}}">{{user[0]}}</option>
 {% end %}
 </select>
-
-</font></p>
 </form></p>
+</font>
+
+
 <FONT size="5"><p>Group<br></FONT>
 
 <select size="10" name="Group" style="width: 150px">

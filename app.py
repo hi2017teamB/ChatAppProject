@@ -69,7 +69,7 @@ class MainHandler(BaseHandler):
         #self.write("Hello, <b>" + str(self.get_current_user()) + "</b> <br> <a href=/auth/logout>Logout</a>")
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=self.get_current_user(),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 
 class AuthLoginHandler(BaseHandler):
@@ -104,7 +104,7 @@ class AuthLogoutHandler(BaseHandler):
 class ChatHandler(BaseHandler):
     waiters = set()
     messages = []
-
+    user_list = []
     def get(self, *args, **kwargs):
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
@@ -116,8 +116,11 @@ class ChatHandler(BaseHandler):
     def open(self, *args, **kwargs):
         print("open")
         print(self)
+        self.user_list.append([self.get_current_user(),self])
+
         self.waiters.add(self)
         self.write_message({'messages': self.messages})
+        print(self.user_list)
 
     def on_message(self, message):
         message = json.loads(message)
@@ -130,6 +133,7 @@ class ChatHandler(BaseHandler):
                 None
             #    continue
             waiter.write_message({'img_path': message['img_path'], 'message': message['message']})
+            #db.insert_massage(get_current_user(),massage['message'])
 
     def on_close(self):
         self.waiters.remove(self)

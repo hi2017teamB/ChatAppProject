@@ -49,13 +49,87 @@ def enter_schedule():
         find_datetime(message[0])
     print(messages)
 
+# def find_time():
+
 def find_datetime(message):
-    pattern = "^毎月[1-9]{1,2}日に(\S*)をリマインド"
+    print(message)
+    pattern = "^(?P<span>次の|毎(週|月))(?P<other>\S+)"
+    pattern2 = "^(([0-9]{4}年)?([1-9]|1[0-2])月)(([1-9]|[1-2][0-9]|3[0-1])日)(?P<other>\S+)"
     match = re.search(pattern , message)
+    match2 = re.search(pattern2, message)
     if match:
-        print(match.group(1))
+        other = match.group("other")
+        if match.group("span") in {"次の", "毎月"}:
+            print(match.group("span"))
+            pattern = "^(?P<days>([0-9]{1,2}日|末|第[1-5][日月火水木金土]曜[日]?)+)に(?P<other>\S+)"
+            match = re.search(pattern , other)
+            if match:
+                other = match.group("other")
+                days = match.group("days")
+                print(match.group("days"))
+                pattern = "[0-9]{1,2}日|末|第[1-5][日月火水木金土]曜[日]?"
+                match_list = re.findall(pattern, days)
+                print(match_list)
+            else:
+                print("構文エラー")
+                return
+
+
+        elif match.group("span") in {"毎週"}:
+            print(match.group("span"))
+            pattern = "(?P<days>([日月火水木金土]曜[日]?)+)(?P<other>\S+)"
+            match = re.search(pattern , other)
+            if match:
+                other = match.group("other")
+                days = match.group("days")
+                print(match.group("days"))
+                pattern = "[日月火水木金土]曜[日]?"
+                match_list = re.findall(pattern, days)
+                print(match_list)
+            else:
+                print("構文エラー")
+                return
+    elif match2:
+        other = match2.group("other")
     else:
-        print("matchFailed")
+        print("構文エラー")
+        return
+
+    pattern = "^(?P<time>\S*)に(?P<item>\S*)をリマインド$"
+    match re.search(pattern, other)
+
+    # pattern = "^毎月(?P<day>(([0-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))+)に(?P<item>\S*)をリマインド"
+    # # pattern = "^毎月([0-9]{1,2}日)([1-9]{1,2}日)に(?P<item>\S*)をリマインド"
+    # match = re.search(pattern , message)
+    # if match:
+    #     print("毎月")
+    #     print(match.group("day"))
+    #     print(match.group("item"))
+    # else:
+    #     # print("matchFailed")
+    #     None
+    #
+    # pattern = "^毎週(?P<day>([日月火水木金土]曜[日]?)+)に(?P<item>\S*)をリマインド"
+    # match = re.search(pattern , message)
+    # if match:
+    #     print("毎週")
+    #     print(match.group("day"))
+    #     print(match.group("item"))
+    # else:
+    #     # print("matchFailed")
+    #     None
+    #
+    # pattern = "^次の(?P<day>(([0-9]{1,2}日)|末|(第[1-5][日月火水木金土]曜[日]?))+)に(?P<item>\S*)をリマインド"
+    # match = re.search(pattern , message)
+    # if match:
+    #     print("一回だけ")
+    #     print(match.group("day"))
+    #     print(match.group("item"))
+    # else:
+    #     # print("matchFailed")
+    #     None
+
+
 
 
 if __name__ == '__main__':

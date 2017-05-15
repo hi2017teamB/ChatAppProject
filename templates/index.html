@@ -96,12 +96,14 @@ Your are log in as {{user_name}}.<br>
 {% end %}
 </select>
 </form></p>
-<p>groupe<br>
-<select size="10" name="groupe">
+<p>group<br>
+<form name="group">
+<select size="10" name="group" onChange="redirect_group_mag()">
 {% for group in group_list %}
-<option value={{group[0]}}>{{group[0]}}</option>
+<option value=./chats?request_group={{group[0]}}>{{group[0]}}</option>
 {% end %}
-</select></p>
+</select>
+</form></p>
 </div>
 <!-- ナビゲーション終了 -->
 

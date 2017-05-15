@@ -8,6 +8,8 @@ BOT_ID = 5
 def get_message(to_id,from_id):
 	return execute_sql("select * from talk where (To_id = "+to_id+" and From_id="+from_id+") or (To_id ="+from_id+" and From_id ="+to_id+") order by Talk_ID")
 
+def get_group_message(group_id):
+	return execute_sql("select * from talk where (To_id = "+group_id+") order by Talk_ID")
 
 def get_now_time():
 	return datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
@@ -35,6 +37,13 @@ def get_user_id_from_name(name):
 	else:
 		print(str(result[0][0]))
 		return str(result[0][0])
+
+def get_group_id_from_name(name):
+	result = execute_sql("select Group_id from \'Group\' where Name = '"+ name+"'")
+	if(len(result) != 1):
+		return None
+	else:
+		return str(result[0][0])	
 
 
 def get_user_name(user_id):

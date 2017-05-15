@@ -30,10 +30,11 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r'/', MainHandler),
+            (r'/chats*',MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
-            (r'/chat/*', ChatHandler),
-            (r'/chats*',MainHandler),
+            (r'/setting',SettingHandler),
+            (r'/chat', ChatHandler),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -62,6 +63,9 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
     def clear_current_user(self):
         self.clear_cookie(self.cookie_username)
 
+class SettingHandler(BaseHandler):
+    def get(self):
+        self.render("setting_window.html")
 
 class MainHandler(BaseHandler):
 

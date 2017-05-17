@@ -3,6 +3,7 @@ CREATE TABLE `Bot` (
   `Message`	TEXT NOT NULL,
 	`Month`	INTEGER NOT NULL,
 	`Week`	INTEGER NOT NULL,
+	`Week_num`	INTEGER NOT NULL,
 	`Start_datetime`	TEXT NOT NULL,
   `To`	TEXT NOT NULL,
   `In_Lab`	INTEGER NOT NULL,

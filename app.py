@@ -24,6 +24,7 @@ define("username", default="user")
 define("password", default="pass")
 
 global to_user
+global group_flag
 
 class Application(tornado.web.Application):
 
@@ -65,17 +66,25 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
 
 class MainHandler(BaseHandler):
 
+    
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
+        global group_flag
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
         global to_user
         try:
             print(self.get_argument("request_user"))
-            self.write("request message is "+self.get_argument("request_user"))
+            #self.write("request message is "+self.get_argument("request_user"))
             to_user=self.get_argument("request_user")
+            group_flag = False
         except:
-            to_user = 'bot'
+            try:
+                to_user=self.get_argument("request_group")
+                group_flag = True
+            except:
+                to_user = 'bot'
+                group_flag = False
         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
 
 
@@ -109,35 +118,68 @@ class AuthLogoutHandler(BaseHandler):
 
 
 class ChatHandler(BaseHandler):
-    waiters = set()
+    waiters = []
     messages = []
-    global to_user
-
+    
     def open(self, *args, **kwargs):#初期メッセージ送信
+        global to_user
+        global group_flag
+
         print("open")
         print(self)
-        self.waiters.add(self)
+        self.waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
         self.messages=[]
-        for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
-            #print(message)
-            self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
-        self.write_message({'messages': self.messages})
+
+        if(group_flag == False):
+
+            for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
+                #print(message)
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user()})
+            self.write_message({'messages': self.messages})
+        else:
+            for message in db.get_group_message(db.get_group_id_from_name(to_user)):
+                #print(message)
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
+            self.write_message({'messages': self.messages})
+
 
     def on_message(self, message):#メーッセージ受信およびブロードキャスト
+        global to_user
+        global group_flag
+
         message = json.loads(message)
         print("on_message")
         print(message)
         print(self.get_current_user())
-        db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-        #self.messages.append(message)
+        if(group_flag==False):
+            db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+            #self.messages.append(message)
+        else:
+            db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
 
+        print(to_user)
+        print(group_flag)
+        print(self.waiters)
         for waiter in self.waiters:
-            if waiter == self:
+            print(waiter)
+            # if waiter[0] == self:
+            #     continue
+            # waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': to_user ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
+            # print("Sended:"+waiter[1])
+            if waiter[0] == self:
                continue
-            waiter.write_message({'img_path': message['img_path'], 'message': message['message']})
-
+            if group_flag == False:
+                print(db.get_user_id_from_name(to_user))
+                if waiter[1] != db.get_user_id_from_name(message["to_user"]):
+                    continue
+            else:
+                if waiter[1] != db.get_group_id_from_name(message["to_user"]):
+                    None
+            waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
+            print("send:"+waiter[1]+'\nmessage:'+message['message'])
+            
     def on_close(self):
-        self.waiters.remove(self)
+        self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 
 
 def main():

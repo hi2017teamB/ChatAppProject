@@ -134,12 +134,12 @@ class ChatHandler(BaseHandler):
 
             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
                 #print(message)
-                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user()})
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
             self.write_message({'messages': self.messages})
         else:
             for message in db.get_group_message(db.get_group_id_from_name(to_user)):
                 #print(message)
-                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
             self.write_message({'messages': self.messages})
 
 
@@ -172,10 +172,13 @@ class ChatHandler(BaseHandler):
                 print(db.get_user_id_from_name(to_user))
                 if waiter[1] != db.get_user_id_from_name(message["to_user"]):
                     continue
+                waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':False})
             else:
-                if waiter[1] != db.get_group_id_from_name(message["to_user"]):
-                    None
-            waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
+                group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
+                for number in group_user_list:
+                    if waiter[1] == number:
+                        waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': self.get_current_user(), 'my_name':db.get_user_name(number) , 'is_group':'True'})
+            
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
             
     def on_close(self):

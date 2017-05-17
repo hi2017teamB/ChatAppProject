@@ -5,6 +5,13 @@ from datetime import datetime
 BOT_ID = 5
 
 
+def get_group_user_list(Group_id):
+	result = execute_sql("select User_ID from \'group\' where Group_id = "+ str(Group_id))
+	if len(result)!=1:
+		return None
+	user_list = result[0][0].split(',')
+	return user_list
+
 def get_message(to_id,from_id):
 	return execute_sql("select * from talk where (To_id = "+to_id+" and From_id="+from_id+") or (To_id ="+from_id+" and From_id ="+to_id+") order by Talk_ID")
 
@@ -43,7 +50,14 @@ def get_group_id_from_name(name):
 	if(len(result) != 1):
 		return None
 	else:
-		return str(result[0][0])	
+		return str(result[0][0])
+
+def get_group_name(id):
+	result = execute_sql("select Name from \'Group\' where Group_id = '"+ str(id)+"'")
+	if(len(result) != 1):
+		return None
+	else:
+		return str(result[0][0])
 
 
 def get_user_name(user_id):

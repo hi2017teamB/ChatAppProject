@@ -35,6 +35,7 @@ class Application(tornado.web.Application):
             (r'/auth/logout', AuthLogoutHandler),
             (r'/chat/*', ChatHandler),
             (r'/chats*',MainHandler),
+            (r'/permission_deny',ErrorHandler),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -82,11 +83,20 @@ class MainHandler(BaseHandler):
             try:
                 to_user=self.get_argument("request_group")
                 group_flag = True
+                user=db.get_user_id_from_name(self.get_current_user())
+                user_list = db.get_group_user_list(db.get_group_id_from_name(to_user))
+                if user in user_list:
+                    None
+                else:
+                    self.redirect("/permission_deny")
             except:
                 to_user = 'bot'
                 group_flag = False
         self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
 
+class ErrorHandler(BaseHandler):
+    def get(self):
+        self.render("permission_deny.html")
 
 class AuthLoginHandler(BaseHandler):
 

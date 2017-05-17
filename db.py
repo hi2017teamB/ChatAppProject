@@ -47,7 +47,7 @@ def get_group_id_from_name(name):
 
 
 def get_user_name(user_id):
-	result = execute_sql("select Name from User where User_id = " + user_id)
+	result = execute_sql("select Name from User where User_id = " + str(user_id))
 
 	if(len(result) !=1):
 		print("not found")

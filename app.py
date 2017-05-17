@@ -134,7 +134,7 @@ class ChatHandler(BaseHandler):
 
             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
                 #print(message)
-                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user()})
             self.write_message({'messages': self.messages})
         else:
             for message in db.get_group_message(db.get_group_id_from_name(to_user)):
@@ -152,24 +152,32 @@ class ChatHandler(BaseHandler):
         print(message)
         print(self.get_current_user())
         if(group_flag==False):
-            db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+            db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
             #self.messages.append(message)
         else:
-            db.insert_message(db.get_group_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+            db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
 
-
-        # for waiter in self.waiters:
-        #     print(waiter)
-        #     if waiter[0] == self:
-        #        continue
-        #     if group_flag == False:
-        #         if waiter[1] != db.get_user_id_from_name(to_user):
-        #             continue
-        #     else:
-        #         if waiter[1] != db.get_group_id_from_name(to_user):
-                    
-        #     waiter[0].write_message({'img_path': message['img_path'], 'message': message['message']})
-
+        print(to_user)
+        print(group_flag)
+        print(self.waiters)
+        for waiter in self.waiters:
+            print(waiter)
+            # if waiter[0] == self:
+            #     continue
+            # waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': to_user ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
+            # print("Sended:"+waiter[1])
+            if waiter[0] == self:
+               continue
+            if group_flag == False:
+                print(db.get_user_id_from_name(to_user))
+                if waiter[1] != db.get_user_id_from_name(message["to_user"]):
+                    continue
+            else:
+                if waiter[1] != db.get_group_id_from_name(message["to_user"]):
+                    None
+            waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
+            print("send:"+waiter[1]+'\nmessage:'+message['message'])
+            
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 

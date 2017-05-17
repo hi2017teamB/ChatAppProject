@@ -3,45 +3,65 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
     <script src="{{ static_url('js/index.js') }}"></script>
     <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
 
+
     <script>
         var socket = new WebSocket('ws://' + location.host + '/chat');
-
-        function sendAction(img_path, msg) {
-
+        function sendAction(img_path, msg ,to_user) {
             var message = {
                 img_path: img_path,
-                message: msg
+                message: msg,
+                to_user: to_user
             };
-
             socket.send(JSON.stringify(message));
         }
+        function getUrlVars(){
+            var vars = [], max = 0, hash = "", array = "";
+            var url = window.location.search;
 
+            //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
+            hash  = url.slice(1).split('&');    
+            max = hash.length;
+            for (var i = 0; i < max; i++) {
+                array = hash[i].split('=');    //keyと値に分割。
+                vars.push(array[0]);    //末尾にクエリ文字列のkeyを挿入。
+                vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
+            }
+
+            return vars;
+        }
         socket.onopen = function(data) {
         }
-
         socket.onclose = function() {
         }
-
         socket.onmessage = function(event) {
             var data = JSON.parse(event.data);
+            var val = getUrlVars();
             if ('messages' in data) {
                 var messages = data.messages;
                 for (var i=0; i<messages.length; i++) {
-                    $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);
+                    if(val["request_user"]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
+                        $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, true);
+                    }
+                    if(val["request_user"]==messages[i].from_user && messages[i].my_name == messages[i].to_user ){
+                        $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);   
+                    }
                 }
             } else {
-                $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
+                // if(val["request_user"]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
+                //     $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
+                // }
+                if(val["request_user"]==data.from_user){
+                    $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);   
+                }
             }
         }
-
         $(document).ready(function() {
-
           var content_off = $("#content").offset();
           var content_width = $("#content").width();
  var content_height = $("#content").height();
@@ -49,61 +69,91 @@
                 {id : "chat_div",
                  title : " ",
                  user : "hoge",
-
                  offset: content_off.left,
-                 width: content_width-5,
+                 width: content_width-40,
                  messageSent: function(id, user, msg){
                      var img_path = $('#face').attr('src');
                      this.boxManager.addMsg(img_path, msg, true);
-                     sendAction(img_path, msg);
+                     val = getUrlVars()
+                     sendAction(img_path, msg,val["request_user"]);
             }});
 // var offset = $("#content").chatbox("option", "offset");
-
-
-
             //
             // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
-$("#chat_div").width(content_width-5);
+$("#chat_div").width(content_width-40);
  $("#chat_div").height(content_height-2);
           //  $("#chat_div").chatbox(offset, content_off-5, 500);
         });
-
     </script>
 </head>
 
 <body>
+
+
 
   <!-- コンテナ開始 -->
 <div id="container">
 
 
 <!-- ヘッダ開始 -->
+
 <div id="header">
-  <P><FONT size="5">メッセージアプリケーション</FONT></P>
-Your are log in as {{user_name}}.<br>
+
+  <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
+  <br>
+You are log in as {{user_name}}.<br>
+
+
+<!-- Autocomplete -->
+
+<div Align="right">
+  <div role="main" class="ui-content">
+    <form method="POST" action="">
+      <div class="ui-field-contain">
+       <label for="entry_book">template：</label>
+       <select id="entry_book" name="entry_book">
+         <option value="otu">お疲れ様です</option>
+         <option value="hello">こんにちは</option>
+       </select>
+     </div>
+    </form><button id="button">挿入</button>
+  </div>
+
+
+
+
+</div>
 </div>
 <!-- ヘッダ終了 -->
 
 <!-- ナビゲーション開始 -->
 <div id="nav">
 
-<p><a href="tmp.html">設定</a></p>
-<p>user<br>
+<form action="#">
+<input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
+</form>
+
+
+<font size="5"><p>User<br>
 <form name="test">
-<select size="10" name="user" onChange="redirect_user_mag()">
+<select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
 {% for user in user_list %}
 <option value="./chats?request_user={{user[0]}}">{{user[0]}}</option>
 {% end %}
 </select>
 </form></p>
-<p>group<br>
-<form name="group">
-<select size="10" name="group" onChange="redirect_group_mag()">
+</font>
+
+
+<FONT size="5"><p>Group<br></FONT>
+
+<select size="10" name="Group" style="width: 150px">
+
+
 {% for group in group_list %}
-<option value=./chats?request_group={{group[0]}}>{{group[0]}}</option>
+<option value={{group[0]}}>{{group[0]}}</option>
 {% end %}
-</select>
-</form></p>
+</select></p>
 </div>
 <!-- ナビゲーション終了 -->
 
@@ -119,8 +169,10 @@ Your are log in as {{user_name}}.<br>
 
 <!-- フッタ開始 -->
 <div id="footer">
-<a href=/auth/logout>Logout</a></div>
-
+<a href=/auth/logout>Logout</a>
+<div Align="right">
+<button id="button">送<br>信</button>
+</div></div>
 <!-- フッタ終了 -->
 
 

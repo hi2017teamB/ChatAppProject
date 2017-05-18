@@ -153,7 +153,7 @@ You are log in as {{user_name}}.<br>
 <form name="test">
 <select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
 {% for user in user_list %}
-<option value="./chats?request_user={{user[0]}}">{{user[0]}}</option>
+<option value="./chats?request_user={{user}}">{{user}}</option>
 {% end %}
 </select>
 </form></p>

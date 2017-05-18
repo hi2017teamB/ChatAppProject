@@ -22,7 +22,12 @@ def get_now_time():
 	return datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
 
 def get_user_list():
-	return execute_sql("select Name from User")
+	result = execute_sql("select Name from User")
+	user_list=[]
+	for user in result:
+		user_list.append(user[0])
+	print(user_list)
+	return user_list
 
 def get_group_list():
 	return execute_sql("select Name from \'Group\'")

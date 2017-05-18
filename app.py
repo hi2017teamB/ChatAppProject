@@ -71,8 +71,10 @@ class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         global group_flag
+        is_permit=True
         face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         img_name = random.choice(face_pics)
+        group_list=[]
         global to_user
         try:
             print(self.get_argument("request_user"))
@@ -88,11 +90,21 @@ class MainHandler(BaseHandler):
                 if user in user_list:
                     None
                 else:
+                    is_permit=False
+                    to_user="bot"
                     self.redirect("/permission_deny")
             except:
                 to_user = 'bot'
                 group_flag = False
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=db.get_user_list(),group_list=db.get_group_list())
+        user=db.get_user_id_from_name(self.get_current_user())
+        for group in db.get_group_list():
+            user_list = db.get_group_user_list(db.get_group_id_from_name(group[0]))
+            if user in user_list:
+                group_list.append(group)
+        user_list = db.get_user_list()
+        user_list.remove(self.get_current_user())
+        if(is_permit):
+            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list)
 
 class ErrorHandler(BaseHandler):
     def get(self):
@@ -182,7 +194,7 @@ class ChatHandler(BaseHandler):
                 print(db.get_user_id_from_name(to_user))
                 if waiter[1] != db.get_user_id_from_name(message["to_user"]):
                     continue
-                waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':False})
+                waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
             else:
                 group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
                 for number in group_user_list:

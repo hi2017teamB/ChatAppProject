@@ -80,6 +80,7 @@ def get_user_name(user_id):
 
 
 def insert_message(to_id, from_id, time, text, is_reserve):
+	print("insert into Talk (\'to_id\', \'from_id\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
 	execute_sql("insert into Talk (\'to_id\', \'from_id\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
 	return
 

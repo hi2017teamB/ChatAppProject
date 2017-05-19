@@ -36,6 +36,8 @@ class Application(tornado.web.Application):
             (r'/chat/*', ChatHandler),
             (r'/chats*',MainHandler),
             (r'/permission_deny',ErrorHandler),
+            (r'/setting',SettingHandler),
+            (r'/creategroupe*',CreateGroupeHandler),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -67,7 +69,7 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
 
 class MainHandler(BaseHandler):
 
-    
+
     @tornado.web.authenticated
     def get(self, *args, **kwargs):
         global group_flag
@@ -110,6 +112,47 @@ class ErrorHandler(BaseHandler):
     def get(self):
         self.render("permission_deny.html")
 
+class SettingHandler(BaseHandler):
+    def get(self):
+        self.render("settings.html")
+
+class CreateGroupeHandler(BaseHandler):
+    def get(self):
+        group_member_id=[]
+        group_list=[]
+        group_member_id_text=""
+        group_member = self.get_argument("group_member")
+        group_member_name = group_member.split(',')
+        group_name = self.get_argument("group_name")
+
+        for one in group_member_name:
+            group_member_id_text+=str(db.get_user_id_from_name(one))+","
+        db.insert_group(group_name,group_member_id_text[0:len(group_member_id_text)-1])
+        print(group_name)
+        print(group_member_id)
+        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+        img_name = random.choice(face_pics)
+        user=db.get_user_id_from_name(self.get_current_user())
+        for group in db.get_group_list():
+            user_list = db.get_group_user_list(db.get_group_id_from_name(group[0]))
+            if user in user_list:
+                group_list.append(group)
+        user_list = db.get_user_list()
+        user_list.remove(self.get_current_user())
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list)
+
+        #self.render("index.html")
+
+    def post(self):
+        print("CreateGroupeHandler")
+        group_member = self.get_argument("group_member")
+        group_name = self.get_argument("group_name")
+
+
+
+        # user_id = db.get_user_id(username,)
+
+
 class AuthLoginHandler(BaseHandler):
 
     def get(self):
@@ -142,7 +185,7 @@ class AuthLogoutHandler(BaseHandler):
 class ChatHandler(BaseHandler):
     waiters = []
     messages = []
-    
+
     def open(self, *args, **kwargs):#初期メッセージ送信
         global to_user
         global group_flag
@@ -200,9 +243,9 @@ class ChatHandler(BaseHandler):
                 for number in group_user_list:
                     if waiter[1] == number:
                         waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': self.get_current_user(), 'my_name':db.get_user_name(number) , 'is_group':'True'})
-            
+
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
-            
+
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 

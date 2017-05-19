@@ -1,197 +1,302 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
-    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
-    <script src="{{ static_url('js/index.js') }}"></script>
-    <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ static_url('css/modal.css') }}" />
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+  <script src="{{ static_url('js/index.js') }}"></script>
+  <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
 
 
-    <script>
-        var socket = new WebSocket('ws://' + location.host + '/chat');
-        function sendAction(img_path, msg ,to_user) {
-            var message = {
-                img_path: img_path,
-                message: msg,
-                to_user: to_user
-            };
-            socket.send(JSON.stringify(message));
-        }
-        function getUrlVars(){
-            var vars = [], max = 0, hash = "", array = "";
-            var url = window.location.search;
+  <script>
+  var socket = new WebSocket('ws://' + location.host + '/chat');
+  function sendAction(img_path, msg ,to_user) {
+    var message = {
+      img_path: img_path,
+      message: msg,
+      to_user: to_user
+    };
+    socket.send(JSON.stringify(message));
+  }
+  function getUrlVars(){
+    var vars = [], max = 0, hash = "", array = "";
+    var url = window.location.search;
 
-            //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
-            hash  = url.slice(1).split('&');    
-            max = hash.length;
-            for (var i = 0; i < max; i++) {
-                array = hash[i].split('=');    //keyと値に分割。
-                vars.push(array[0]);    //末尾にクエリ文字列のkeyを挿入。
-                is_group = array[0];
-                vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
-            }
+    //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
+    hash  = url.slice(1).split('&');
+    max = hash.length;
+    for (var i = 0; i < max; i++) {
+      array = hash[i].split('=');    //keyと値に分割。
+      vars.push(array[0]);    //末尾にクエリ文字列のkeyを挿入。
+      is_group = array[0];
+      vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
+    }
 
-            return vars;
+    return vars;
+  }
+  socket.onopen = function(data) {
+  }
+  socket.onclose = function() {
+  }
+  socket.onmessage = function(event) {
+    var data = JSON.parse(event.data);
+    var val = getUrlVars();
+    if ('messages' in data) {
+      var messages = data.messages;
+      for (var i=0; i<messages.length; i++) {
+        if (messages[i].is_group == 'False'){
+          if(val[is_group]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
+            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, true);
+          }
+          if(val[is_group]==messages[i].from_user && messages[i].my_name == messages[i].to_user ){
+            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);
+          }
+        }else{
+          if(val[is_group]==messages[i].to_user && messages[i].from_user == messages[i].my_name){
+            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, true);
+          }else{
+            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);
+          }
         }
-        socket.onopen = function(data) {
+      }
+    } else {
+      // if(val["request_user"]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
+      //     $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
+      // }
+      if(data.is_group == 'False'){
+        if(val[is_group]==data.from_user){
+          $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
         }
-        socket.onclose = function() {
+      }else{
+        if(val[is_group]==data.to_user){
+          $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
         }
-        socket.onmessage = function(event) {
-            var data = JSON.parse(event.data);
-            var val = getUrlVars();
-            if ('messages' in data) {
-                var messages = data.messages;
-                for (var i=0; i<messages.length; i++) {
-                    if (messages[i].is_group == 'False'){
-                        if(val[is_group]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
-                            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, true);
-                        }
-                        if(val[is_group]==messages[i].from_user && messages[i].my_name == messages[i].to_user ){
-                            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);   
-                        }
-                    }else{
-                        if(val[is_group]==messages[i].to_user && messages[i].from_user == messages[i].my_name){
-                            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, true);
-                        }else{
-                            $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);   
-                        }
-                    }
-                }
-            } else {
-                // if(val["request_user"]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
-                //     $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
-                // }
-                if(data.is_group == 'False'){
-                    if(val[is_group]==data.from_user){
-                        $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);   
-                    }
-                }else{
-                    if(val[is_group]==data.to_user){
-                        $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);   
-                    }
-                }
-            }
-        }
-        $(document).ready(function() {
-          var content_off = $("#content").offset();
-          var content_width = $("#content").width();
- var content_height = $("#content").height();
-            $("#chat_div").chatbox(
-                {id : "chat_div",
-                 title : " ",
-                 user : "hoge",
-                 offset: content_off.left,
-                 width: content_width-40,
-                 messageSent: function(id, user, msg){
-                     var img_path = $('#face').attr('src');
-                     this.boxManager.addMsg(img_path, msg, true);
-                     val = getUrlVars()
-                     sendAction(img_path, msg,val[is_group]);
-            }});
-// var offset = $("#content").chatbox("option", "offset");
-            //
-            // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
-$("#chat_div").width(content_width-40);
- $("#chat_div").height(content_height-2);
-          //  $("#chat_div").chatbox(offset, content_off-5, 500);
+      }
+    }
+  }
+  $(document).ready(function() {
+    var content_off = $("#content").offset();
+    var content_width = $("#content").width();
+    var content_height = $("#content").height();
+    $("#chat_div").chatbox(
+      {id : "chat_div",
+      title : " ",
+      user : "hoge",
+      offset: content_off.left,
+      width: content_width-40,
+      messageSent: function(id, user, msg){
+        var img_path = $('#face').attr('src');
+        this.boxManager.addMsg(img_path, msg, true);
+        val = getUrlVars()
+        sendAction(img_path, msg,val[is_group]);
+      }});
+      // var offset = $("#content").chatbox("option", "offset");
+      //
+      // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
+      $("#chat_div").width(content_width-40);
+      $("#chat_div").height(content_height-2);
+      //  $("#chat_div").chatbox(offset, content_off-5, 500);
+    });
+
+    $(function(){
+      $('.modal-open').click(function(){// 「.modal-open」をクリック
+        $('body').append('<div class="modal-overlay"></div>');// オーバーレイ用の要素を追加
+        $('.modal-overlay').fadeIn('slow');  // オーバーレイをフェードイン
+        var modal = '#' + $(this).attr('data-target');// モーダルコンテンツのIDを取得
+        modalResize();// モーダルコンテンツの表示位置を設定
+        $(modal).fadeIn('slow'); // モーダルコンテンツフェードイン
+
+        // 「.modal-overlay」あるいは「.modal-close」をクリック
+        $('.modal-overlay, .modal-close').off().click(function(){
+          // モーダルコンテンツとオーバーレイをフェードアウト
+          $(modal).fadeOut('slow');
+          $('.modal-overlay').fadeOut('slow',function(){
+            // オーバーレイを削除
+            $('.modal-overlay').remove();
+          });
         });
+        // リサイズしたら表示位置を再取得
+        $(window).on('resize', function(){
+          modalResize();
+        });
+
+        // モーダルコンテンツの表示位置を設定する関数
+        function modalResize(){
+          // ウィンドウの横幅、高さを取得
+          var w = $(window).width();
+          var h = $(window).height();
+
+          // モーダルコンテンツの表示位置を取得
+          var x = (w - $(modal).outerWidth(true)) / 2;
+          var y = (h - $(modal).outerHeight(true)) / 2;
+
+          // モーダルコンテンツの表示位置を設定
+          $(modal).css({'left': x + 'px','top': y + 'px'});
+        }
+
+      });
+    });
+
+    function group_create(){
+      var str;
+      var group_member = "";
+      var group_name;
+      if(document.group_name_text.create_group_name.value != ""){
+        group_name = document.group_name_text.create_group_name.value;
+        str="Create OK?"
+        for (var i=0;i<document.menber.elements.length;i++){
+          if( document.menber.elements[i].checked )
+          {
+            group_member+=document.menber.elements[i].value+",";
+            str = str+"\n"+document.menber.elements[i].value
+          }
+        }
+
+        str = str+"\n"+"groupe name:"+document.group_name_text.create_group_name.value
+        ret = confirm(str);
+        if (ret == true){
+
+        }
+        location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
+      }
+      else if(document.group_name_text.create_group_name.value == ""){
+        ret = confirm("group name is not setting.");
+      }
+
+
+    }
     </script>
-</head>
+  </head>
 
-<body>
-
-
-
-  <!-- コンテナ開始 -->
-<div id="container">
-
-
-<!-- ヘッダ開始 -->
-
-<div id="header">
-
-  <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
-  <br>
-You are log in as {{user_name}}.<br>
-
-
-<!-- Autocomplete -->
-
-<div Align="right">
-  <div role="main" class="ui-content">
-    <form method="POST" action="">
-      <div class="ui-field-contain">
-       <label for="entry_book">template：</label>
-       <select id="entry_book" name="entry_book">
-         <option value="otu">お疲れ様です</option>
-         <option value="hello">こんにちは</option>
-       </select>
-     </div>
-    </form><button id="button">挿入</button>
-  </div>
+  <body>
 
 
 
-
-</div>
-</div>
-<!-- ヘッダ終了 -->
-
-<!-- ナビゲーション開始 -->
-<div id="nav">
-
-<form action="#">
-<input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
-</form>
+    <!-- コンテナ開始 -->
+    <div id="container">
 
 
-<font size="5"><p>User<br>
-<form name="test">
-<select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
-{% for user in user_list %}
-<option value="./chats?request_user={{user}}">{{user}}</option>
-{% end %}
-</select>
-</form></p>
-</font>
+      <!-- ヘッダ開始 -->
+
+      <div id="header">
+
+        <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
+        <br>
+        You are log in as {{user_name}}.<br>
 
 
-<FONT size="5"><p>Group<br></FONT>
-<form name="group">
-<select size="10" name="group" style="width: 150px " onChange="redirect_group_mag()">
-{% for group in group_list %}
-<option value="./chats?request_group={{group[0]}}">{{group[0]}}</option>
-{% end %}
-</select></p>
-</div>
-<!-- ナビゲーション終了 -->
 
-<!-- メインカラム開始 -->
-<div id="content">
+        <!-- Autocomplete -->
 
-<img src="{{ img_path }}" id="face" style="visibility:hidden">
-<div id="chat_div" class="chat"></div>
-
-
-</div>
-<!-- メインカラム終了 -->
-
-<!-- フッタ開始 -->
-<div id="footer">
-<a href=/auth/logout>Logout</a>
-<div Align="right">
-<button id="button">送<br>信</button>
-</div></div>
-<!-- フッタ終了 -->
+        <div Align="right">
+          <div role="main" class="ui-content">
+            <form method="POST" action="">
+              <div class="ui-field-contain">
+                <label for="entry_book">template：</label>
+                <select id="entry_book" name="entry_book">
+                  <option value="otu">お疲れ様です</option>
+                  <option value="hello">こんにちは</option>
+                </select>
+              </div>
+            </form><button id="button">挿入</button>
+          </div>
 
 
-</div>
-<!-- コンテナ終了 -->
 
 
-</body>
-</html>
+        </div>
+      </div>
+      <!-- ヘッダ終了 -->
+
+      <!-- ナビゲーション開始 -->
+      <div id="nav">
+
+        <form action="#">
+          <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
+        </form>
+
+        <input type="button" value="setting" data-target="con1" class="modal-open">
+
+        <div id="con1" class="modal-content">
+          <body>
+            <h2>Setting window</h2>
+            <li>Group create</li>
+            <ul>
+              <form name="menber" >
+                <input type="checkbox" value="bot">bot
+                <br><input type="checkbox" value="konishi">konishi
+                <br><input type="checkbox" value="shirasawa">shirasawa
+                <br><input type="checkbox" value="shigematu">shigematu
+                <br><input type="checkbox" value="tanaka">tanaka
+                <br>
+              </form>
+              <form name="group_name_text" >
+                Group name:<input type="text" id="create_group_name" name="create_group_name" size="15" maxlength="20">
+              </form>
+              <br>
+
+              <input name="group_create" type="button" value="Create" class="modal-close" onClick="group_create();",>
+              <!-- location.reload();-->
+              <br><br>
+            </ul>
+            <li>template create</li>
+            <ul>
+              template:
+              <form>
+                <textarea name="template_message" rows="3" cols="50" wrap="hard">
+                </textarea>
+              </form>
+            </ul>
+          </body>
+          <p><a class="modal-close">close</a></p>
+        </div>
+
+        <font size="5"><p>User<br>
+          <form name="test">
+            <select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
+              {% for user in user_list %}
+              <option value="./chats?request_user={{user}}">{{user}}</option>
+              {% end %}
+            </select>
+          </form></p>
+        </font>
+
+
+        <FONT size="5"><p>Group<br></FONT>
+          <form name="group">
+            <select size="10" name="group" style="width: 150px " onChange="redirect_group_mag()">
+              {% for group in group_list %}
+              <option value="./chats?request_group={{group[0]}}">{{group[0]}}</option>
+              {% end %}
+            </select></p>
+          </div>
+          <!-- ナビゲーション終了 -->
+
+          <!-- メインカラム開始 -->
+          <div id="content">
+
+            <img src="{{ img_path }}" id="face" style="visibility:hidden">
+            <div id="chat_div" class="chat"></div>
+
+
+          </div>
+          <!-- メインカラム終了 -->
+
+          <!-- フッタ開始 -->
+          <div id="footer">
+            <a href=/auth/logout>Logout</a>
+            <div Align="right">
+              <button id="button">send</button>
+            </div></div>
+            <!-- フッタ終了 -->
+
+
+          </div>
+          <!-- コンテナ終了 -->
+
+
+        </body>
+        </html>

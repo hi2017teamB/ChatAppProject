@@ -5,6 +5,9 @@ from datetime import datetime
 BOT_ID = 5
 
 
+def insert_group(groupname,userlist):
+	execute_sql("insert into \'Group\' (Name,User_ID) values(\""+str(groupname)+"\",\""+userlist+"\")")
+
 def get_group_user_list(Group_id):
 	result = execute_sql("select User_ID from \'group\' where Group_id = "+ str(Group_id))
 	if len(result)!=1:

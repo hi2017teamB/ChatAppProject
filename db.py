@@ -17,6 +17,9 @@ def get_now_time():
 def get_user_list():
 	return execute_sql("select Name from User")
 
+def get_user_id_liet():
+	return execute_sql("select User_ID from User")
+
 def get_group_list():
 	return execute_sql("select Name from \'Group\'")
 
@@ -43,7 +46,7 @@ def get_group_id_from_name(name):
 	if(len(result) != 1):
 		return None
 	else:
-		return str(result[0][0])	
+		return str(result[0][0])
 
 
 def get_user_name(user_id):
@@ -59,6 +62,10 @@ def get_user_name(user_id):
 
 def insert_message(to_id, from_id, time, text, is_reserve):
 	execute_sql("insert into Talk (\'to_id\', \'from_id\', time, text, is_reserve) values ("+str(to_id)+","+str(from_id)+",\""+time+"\",\""+text+"\","+str(is_reserve)+")")
+	return
+
+def insert_reminder(message, month, month_end, week, week_number, start_datetime, to, in_lab, flag):
+	execute_sql("insert into Bot (Message, Month, Month_end, Week, Week_number, start_datetime, \'To\', In_Lab, Flag) values (\"" + message +"\","+ str(month) +","+ str(month_end) +","+ str(week) +","+ str(week_number) +",\""+ start_datetime +"\",\""+ to +"\","+ str(in_lab) +","+ str(flag) + ")")
 	return
 
 def get_user_from_grade(grade):
@@ -77,9 +84,16 @@ def change_flag(bot_id, flag):
 	result = execute_sql("update bot set Flag = " + str(flag) + " where Bot_id = " + str(bot_id))
 	return
 
+def change_start_datetime(bot_id, next_datetime):
+	result = execute_sql("update bot set Start_datetime = \"" + next_datetime + "\" where Bot_id = " + str(bot_id))
+	return
+
+def delete_schedule(bot_id):
+	result = execute_sql("delete from Bot where Bot_id = " + str(bot_id))
+
 def get_unread_message_for_bot():
 	result = execute_sql("select Text from Talk where Talk.'To_id' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
-	# a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To_id' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 
 

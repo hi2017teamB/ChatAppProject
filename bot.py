@@ -329,7 +329,7 @@ if __name__ == '__main__':
                     db.change_flag(result[0], 0)
 
             else:
-                if(result[7] == 0):
+                if(result[9] == 0):
                     db.change_flag(result[0], 1)
                 print("failed1")
         # print (datetime.now().weekday())

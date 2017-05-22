@@ -18,6 +18,8 @@ from tornado.web import url
 import os
 import logging
 import db
+import datetime
+import time
 
 define("port", default=5000, type=int)
 define("username", default="user")
@@ -39,6 +41,7 @@ class Application(tornado.web.Application):
             (r'/permission_deny',ErrorHandler),
             (r'/setting',SettingHandler),
             (r'/creategroupe*',CreateGroupeHandler),
+            (r'/deletegroupe*',DeleteGroupeHandler),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -110,7 +113,7 @@ class MainHandler(BaseHandler):
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
         if(is_permit):
-            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list)
+            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user())
 
 class ErrorHandler(BaseHandler):
     def get(self):
@@ -143,7 +146,7 @@ class CreateGroupeHandler(BaseHandler):
                 group_list.append(group)
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list)
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user())
 
         #self.render("index.html")
 
@@ -155,6 +158,32 @@ class CreateGroupeHandler(BaseHandler):
 
 
         # user_id = db.get_user_id(username,)
+
+class DeleteGroupeHandler(BaseHandler):
+    def get(self):
+        group_list=[]
+        group_name = self.get_argument("group_name")
+
+        db.delete_group(group_name)
+        print(group_name)
+        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
+        img_name = random.choice(face_pics)
+        user=db.get_user_id_from_name(self.get_current_user())
+        for group in db.get_group_list():
+            user_list = db.get_group_user_list(db.get_group_id_from_name(group[0]))
+            if user in user_list:
+                group_list.append(group)
+        user_list = db.get_user_list()
+        user_list.remove(self.get_current_user())
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user())
+
+        #self.render("index.html")
+
+    def post(self):
+        print("DeleteGroupeHandler")
+        group_name = self.get_argument("group_name")
+
+
 
 
 class AuthLoginHandler(BaseHandler):
@@ -243,17 +272,14 @@ class ChatHandler(BaseHandler):
         print(self.waiters)
         for waiter in self.waiters:
             print(waiter)
-            # if waiter[0] == self:
-            #     continue
-            # waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': to_user ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
-            # print("Sended:"+waiter[1])
             if waiter[0] == self:
                continue
             if group_flag == False:
                 print(db.get_user_id_from_name(to_user))
                 if waiter[1] != db.get_user_id_from_name(message["to_user"]):
                     continue
-                waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
+                if self.check_active_time(message["to_user"],message):
+                    waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
             else:
                 group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
                 for number in group_user_list:
@@ -264,6 +290,28 @@ class ChatHandler(BaseHandler):
 
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
+
+    def check_active_time(self,reseiver,message):
+        active_time = db.get_active_time(reseiver)
+        #print(str(active_time[0][0][0:2]))
+        now = datetime.time(datetime.datetime.now().hour,datetime.datetime.now().minute,0)
+        #start = now.strptime(str(active_time[0][0]), '%H:%M')
+        #end = now.strptime(str(active_time[0][1]), '%H:%M')
+        start = datetime.time(int(str(active_time[0][0][0:2])),int(str(active_time[0][0][3:5])),0)
+        end = datetime.time(int(str(active_time[0][1][0:2])),int(str(active_time[0][1][3:5])),0)
+
+        print("check_active_time")
+        print(start)
+        print(end)
+        print(now)
+        if(start <= now and now <= end):
+            return True
+        else:
+            text = "System message:"+message["to_user"]+" is not in active.So your massage is not delivered to "+message["to_user"]+".Your massage is still with system."
+            self.write_message({'img_path': message['img_path'], 'message': text , 'to_user': self.get_current_user() ,'from_user': message["to_user"], 'my_name':self.get_current_user() , 'is_group':'False'})
+            return False
+
+
 
 
 def main():

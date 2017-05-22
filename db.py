@@ -4,6 +4,19 @@ from datetime import datetime
 #SQL文を実行する場合はself.execute_sql(sql)を呼ぶこと
 BOT_ID = 5
 
+def get_active_time(resiever):
+	result = execute_sql("select Active_Time_start,Active_time_end from \'user\' where Name= \""+ str(resiever)+"\"")
+	print(result)
+	active_time=[]
+	for i in result:
+		active_time.append(i)
+	if len(i)!=2:
+		return None
+	else:
+		return result
+
+def delete_group(groupname):
+	execute_sql("delete from \'Group\' where Name = \""+str(groupname)+"\"")
 
 def insert_group(groupname,userlist):
 	execute_sql("insert into \'Group\' (Name,User_ID) values(\""+str(groupname)+"\",\""+userlist+"\")")
@@ -36,7 +49,7 @@ def get_user_id_list():
 	return execute_sql("select User_ID from User")
 
 def get_group_list():
-	return execute_sql("select Name from \'Group_Info\'")
+	return execute_sql("select Name from \'Group\'")
 
 def get_user_id(name,passwd):
 	result = execute_sql("select User_id from User where Name = '" + name + "' and PassWord = '" + passwd +"'")

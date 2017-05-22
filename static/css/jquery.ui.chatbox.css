@@ -2,12 +2,12 @@
 .ui-chatbox {
     position: fixed;
     bottom:0;
-    padding: 2px;
-    background:  #48bdd5;
-    border-radius: 10px 10px 0px 0px / 10px 10px 0px 0px;
+    /*padding: 2px;*/
+    /*background:  #48bdd5;*/
+    /*border-radius: 10px 10px 0px 0px / 10px 10px 0px 0px;*/
 }
 
-.ui-chatbox-titlebar {
+/*.ui-chatbox-titlebar {
     border-radius: 10px 10px 0px 0px / 10px 10px 0px 0px;
     padding: 3px;
     height: 40px;
@@ -18,7 +18,7 @@
     color: white;
     display: table-cell;
     vertical-align: middle;
-}
+}*/
 
 .ui-chatbox-content {
     padding: 0px;
@@ -40,12 +40,13 @@
 }
 
 .ui-chatbox-input-box {
-    height: 50px;
-    width: 500px;
+    height: 8vh;
+    width: 50px;
     resize: none;
     display: table-cell;
     vertical-align: middle;
     font-size: 16px;
+
 }
 
 .ui-chatbox-icon {

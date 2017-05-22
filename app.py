@@ -33,13 +33,11 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r'/', MainHandler),
-            (r'/chats*',MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
-            (r'/chat/', ChatHandler),
+            (r'/chat/*', ChatHandler),
             (r'/chats*',MainHandler),
             (r'/permission_deny',ErrorHandler),
-            (r'/setting',SettingHandler),
             (r'/creategroupe*',CreateGroupeHandler),
             (r'/deletegroupe*',DeleteGroupeHandler),
         ]
@@ -70,9 +68,6 @@ class BaseHandler(tornado.websocket.WebSocketHandler):
     def clear_current_user(self):
         self.clear_cookie(self.cookie_username)
 
-class SettingHandler(BaseHandler):
-    def get(self):
-        self.render("setting_window.html")
 
 class MainHandler(BaseHandler):
 
@@ -118,10 +113,6 @@ class MainHandler(BaseHandler):
 class ErrorHandler(BaseHandler):
     def get(self):
         self.render("permission_deny.html")
-
-class SettingHandler(BaseHandler):
-    def get(self):
-        self.render("settings.html")
 
 class CreateGroupeHandler(BaseHandler):
     def get(self):
@@ -183,9 +174,6 @@ class DeleteGroupeHandler(BaseHandler):
         print("DeleteGroupeHandler")
         group_name = self.get_argument("group_name")
 
-
-
-
 class AuthLoginHandler(BaseHandler):
 
     def get(self):
@@ -218,7 +206,7 @@ class AuthLogoutHandler(BaseHandler):
 class ChatHandler(BaseHandler):
     waiters = []
     messages = []
-    
+
     def open(self, *args, **kwargs):#初期メッセージ送信
         global to_user
         global group_flag
@@ -260,22 +248,25 @@ class ChatHandler(BaseHandler):
         print(self.waiters)
         for waiter in self.waiters:
             print(waiter)
-            if waiter[0] == self:
-               continue
+            # if waiter[0] == self:
+            #    continue
             if group_flag == False:
                 print(db.get_user_id_from_name(to_user))
-                if waiter[1] != db.get_user_id_from_name(message["to_user"]):
-                    continue
                 if self.check_active_time(message["to_user"],message):
-                    waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
+                    if waiter[1] != db.get_user_id_from_name(message["to_user"]):
+                        continue
+                    else:
+                        waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
+                else:
+                    break
             else:
                 group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
                 for number in group_user_list:
                     if waiter[1] == number:
                         waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': self.get_current_user(), 'my_name':db.get_user_name(number) , 'is_group':'True'})
-            
+
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
-            
+
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 
@@ -287,7 +278,7 @@ class ChatHandler(BaseHandler):
         #end = now.strptime(str(active_time[0][1]), '%H:%M')
         start = datetime.time(int(str(active_time[0][0][0:2])),int(str(active_time[0][0][3:5])),0)
         end = datetime.time(int(str(active_time[0][1][0:2])),int(str(active_time[0][1][3:5])),0)
-        
+
         print("check_active_time")
         print(start)
         print(end)
@@ -298,8 +289,6 @@ class ChatHandler(BaseHandler):
             text = "System message:"+message["to_user"]+" is not in active.So your massage is not delivered to "+message["to_user"]+".Your massage is still with system."
             self.write_message({'img_path': message['img_path'], 'message': text , 'to_user': self.get_current_user() ,'from_user': message["to_user"], 'my_name':self.get_current_user() , 'is_group':'False'})
             return False
-
-
 
 
 

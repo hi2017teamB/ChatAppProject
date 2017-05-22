@@ -140,6 +140,7 @@
       });
     });
 
+
     function group_create(){
       var str;
       var group_member = "";
@@ -165,9 +166,8 @@
       else if(document.group_name_text.create_group_name.value == ""){
         ret = confirm("group name is not setted.");
       }
-
-
     }
+
     function group_delete(){
       var group_name;
       var str
@@ -185,6 +185,10 @@
         ret = alert("group name is not selected.");
       }
     }
+
+
+
+
     </script>
   </head>
 
@@ -203,7 +207,6 @@
         <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
         <br>
         You are log in as {{user_name}}.<br>
-
 
 
         <!-- Autocomplete -->
@@ -320,7 +323,7 @@
             <div id="footer">
               <a href=/auth/logout>Logout</a>
               <div Align="right">
-                <button id="button">send</button>
+                <button id="button">送<br>信</button>
               </div></div>
               <!-- フッタ終了 -->
 

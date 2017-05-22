@@ -257,11 +257,11 @@ class ChatHandler(BaseHandler):
         print(message)
         print(self.get_current_user())
 # <<<<<<< HEAD
-#         if(group_flag==False):
-#             db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-#             #self.messages.append(message)
-#         else:
-#             db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+        if(group_flag==False):
+            db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+             #self.messages.append(message)
+        else:
+            db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
 # =======
 #         db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
 #         #self.messages.append(message)

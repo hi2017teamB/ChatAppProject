@@ -32,7 +32,7 @@ def get_user_list():
 	print(user_list)
 	return user_list
 
-def get_user_id_liet():
+def get_user_id_list():
 	return execute_sql("select User_ID from User")
 
 def get_group_list():
@@ -116,8 +116,8 @@ def delete_schedule(bot_id):
 	result = execute_sql("delete from Bot where Bot_id = " + str(bot_id))
 
 def get_unread_message_for_bot():
-	result = execute_sql("select Text from Talk where Talk.'To_id' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
-	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To_id' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	result = execute_sql("select Text from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
+	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where To_id = \"" + str(BOT_ID) + "\" and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 
 

@@ -19,7 +19,9 @@ def match_schedule(r):
     start_datetime = datetime.strptime(str_datetime, '%Y/%m/%d-%H:%M:%S')
 
     # 当日
-    if(start_datetime.date == now_datetime.date):
+    print(start_datetime.date())
+    print(now_datetime.date())
+    if(start_datetime.date() == now_datetime.date()):
         flag = True
 
     # # 毎月
@@ -32,18 +34,20 @@ def match_schedule(r):
     #     if(start_datetime.weekday == now_datetime.weekday):
     #         flag = True
 
+    print(start_datetime.strftime("%H:%M"))
+    print(now_datetime.strftime("%H:%M"))
     # 日付があって時刻もあってたら
     if(flag == True and start_datetime.strftime("%H:%M") == now_datetime.strftime("%H:%M")):
     # if(flag == True and (start_datetime.strftime("%H") == now_datetime.strftime("%H"))):
         flag = True
         f = 1
-        if(r[3]>0):
+        if(r[2]>0):
             next_datetime = start_datetime + relativedelta(months=1)
-        elif(r[4]>0):
+        elif(r[3]>0):
             next_datetime = start_datetime + relativedelta(months=1, day=31)
-        elif(r[5]>0):
+        elif(r[4]>0):
             next_datetime = start_datetime + relativedelta(days=7)
-        elif(r[6]>0):
+        elif(r[5]>0):
             ns = start_datetime + relativedelta(months=1, day=1)
             ne = start_datetime + relativedelta(months=1, day=31)
             L = rrule(WEEKLY, byweekday=start_datetime.weekday, dtstart=ns, until=ne)
@@ -60,14 +64,20 @@ def match_schedule(r):
     else:
         flag = False
 
+    print(flag)
     return flag
 
 
 def enter_schedule():
     messages = db.get_unread_message_for_bot()
+    print(messages)
     for message in messages:
         print(message)
         s = syntax_matching(message[0])
+        #print(s)
+        if(s.span == None):
+            s.span=""
+            s.show_all()
         month, week, s_flag = span_flag(s.span)
         d_list, me_list, wn_list = calc_startday(s_flag, s.days)
         member = select_member(s.grade)
@@ -110,7 +120,7 @@ def calc_time(time):
     if ":" in time:
         pattern = "((?P<ap>am|AM|pm|PM)?)(?P<hour>[0-9]{1,2}):(?P<min>[0-9]{1,2})"
     else:
-        pattern = "(?P<ap>(午前|午後)?)(?P<hour>[0-9]{1,2})時(?P<min>([0-9]{1,2}分)?)"
+        pattern = "(?P<ap>(午前|午後)?)(?P<hour>[0-9]{1,2})時(?P<min>([0-9]{1,2})?)分?"
 
     match = re.search(pattern, time)
     ap = match.group("ap")
@@ -269,7 +279,7 @@ def span_flag(span):
     elif span in {"来年", "来年の"}:
         return [0,0,5]
     else:
-        return False
+        return [0,0,0]
 
 
 def syntax_matching(message):
@@ -279,6 +289,7 @@ def syntax_matching(message):
     if match:
         print("match")
         s = Syntax(match.group("span"), match.group("days"), match.group("time"), match.group("lab"), match.group("member"), match.group("item"))
+        s.show_all()
         return s
     else:
         print("unmatch")
@@ -331,7 +342,7 @@ if __name__ == '__main__':
             else:
                 if(result[9] == 0):
                     db.change_flag(result[0], 1)
-                print("failed1")
+                # print("failed1")
         # print (datetime.now().weekday())
 
 

@@ -218,7 +218,7 @@ class AuthLogoutHandler(BaseHandler):
 class ChatHandler(BaseHandler):
     waiters = []
     messages = []
-
+    
     def open(self, *args, **kwargs):#初期メッセージ送信
         global to_user
         global group_flag
@@ -227,26 +227,19 @@ class ChatHandler(BaseHandler):
         print(self)
         self.waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
         self.messages=[]
-# <<<<<<< HEAD
-#
-#         if(group_flag == False):
-#
-#             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
-#                 #print(message)
-#                 self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
-#             self.write_message({'messages': self.messages})
-#         else:
-#             for message in db.get_group_message(db.get_group_id_from_name(to_user)):
-#                 #print(message)
-#                 self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
-#             self.write_message({'messages': self.messages})
-#
-# =======
-#         for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
-#             #print(message)
-#             self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
-#         self.write_message({'messages': self.messages})
-# >>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
+
+        if(group_flag == False):
+
+            for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
+                #print(message)
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
+            self.write_message({'messages': self.messages})
+        else:
+            for message in db.get_group_message(db.get_group_id_from_name(to_user)):
+                #print(message)
+                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
+            self.write_message({'messages': self.messages})
+
 
     def on_message(self, message):#メーッセージ受信およびブロードキャスト
         global to_user
@@ -256,16 +249,11 @@ class ChatHandler(BaseHandler):
         print("on_message")
         print(message)
         print(self.get_current_user())
-# <<<<<<< HEAD
         if(group_flag==False):
             db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-             #self.messages.append(message)
+            #self.messages.append(message)
         else:
             db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-# =======
-#         db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-#         #self.messages.append(message)
-# >>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
         print(to_user)
         print(group_flag)
@@ -285,9 +273,9 @@ class ChatHandler(BaseHandler):
                 for number in group_user_list:
                     if waiter[1] == number:
                         waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': self.get_current_user(), 'my_name':db.get_user_name(number) , 'is_group':'True'})
-
+            
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
-
+            
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 
@@ -299,7 +287,7 @@ class ChatHandler(BaseHandler):
         #end = now.strptime(str(active_time[0][1]), '%H:%M')
         start = datetime.time(int(str(active_time[0][0][0:2])),int(str(active_time[0][0][3:5])),0)
         end = datetime.time(int(str(active_time[0][1][0:2])),int(str(active_time[0][1][3:5])),0)
-
+        
         print("check_active_time")
         print(start)
         print(end)
@@ -310,6 +298,8 @@ class ChatHandler(BaseHandler):
             text = "System message:"+message["to_user"]+" is not in active.So your massage is not delivered to "+message["to_user"]+".Your massage is still with system."
             self.write_message({'img_path': message['img_path'], 'message': text , 'to_user': self.get_current_user() ,'from_user': message["to_user"], 'my_name':self.get_current_user() , 'is_group':'False'})
             return False
+
+
 
 
 

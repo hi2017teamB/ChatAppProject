@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<<<<<<< HEAD
   <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
   <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
@@ -10,6 +11,19 @@
   <script src="{{ static_url('js/index.js') }}"></script>
   <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
 
+=======
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.ui.chatbox.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/body.css') }}" />
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script src="{{ static_url('js/index.js') }}"></script>
+    <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
+
+
+    <script>
+        var socket = new WebSocket('ws://' + location.host + '/chat');
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
   <script>
   var socket = new WebSocket('ws://' + location.host + '/chat');
@@ -171,6 +185,7 @@
     </script>
   </head>
 
+<<<<<<< HEAD
   <body>
 
 
@@ -178,6 +193,30 @@
     <!-- コンテナ開始 -->
     <div id="container">
 
+=======
+                 offset: content_off.left,
+                 width: content_width-40,
+                 messageSent: function(id, user, msg){
+                     var img_path = $('#face').attr('src');
+                     this.boxManager.addMsg(img_path, msg, true);
+                     sendAction(img_path, msg);
+            }});
+// var offset = $("#content").chatbox("option", "offset");
+
+
+
+            //
+            // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
+$("#chat_div").width(content_width-40);
+ $("#chat_div").height(content_height-2);
+          //  $("#chat_div").chatbox(offset, content_off-5, 500);
+        });
+
+
+
+    </script>
+</head>
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
       <!-- ヘッダ開始 -->
 
@@ -218,7 +257,14 @@
           <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
         </form>
 
+<<<<<<< HEAD
         <input type="button" value="setting" data-target="con1" class="modal-open">
+=======
+
+
+  <!-- コンテナ開始 -->
+<div id="container">
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
         <div id="con1" class="modal-content">
           <body>
@@ -238,6 +284,7 @@
               </form>
               <br>
 
+<<<<<<< HEAD
               <input name="group_create" type="button" value="Create" class="modal-close" onClick="group_create();",>
               <!-- location.reload();-->
               <br><br>
@@ -253,6 +300,38 @@
           </body>
           <p><a class="modal-close">close</a></p>
         </div>
+=======
+<!-- ヘッダ開始 -->
+
+<div id="header">
+
+  <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
+  <br>
+You are log in as {{user_name}}.<br>
+
+
+<!-- Autocomplete -->
+
+<div Align="right">
+  <div role="main" class="ui-content">
+    <form method="POST" action="">
+      <div class="ui-field-contain">
+       <label for="entry_book">template：</label>
+       <select id="entry_book" name="entry_book">
+         <option value="otu">お疲れ様です</option>
+         <option value="hello">こんにちは</option>
+       </select>
+     </div>
+    </form><button id="button">挿入</button>
+  </div>
+
+
+
+
+</div>
+</div>
+<!-- ヘッダ終了 -->
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
         <font size="5"><p>User<br>
           <form name="test">
@@ -264,6 +343,37 @@
           </form></p>
         </font>
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<form action="#">
+<input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
+</form>
+
+
+<font size="5"><p>User<br>
+<form name="test">
+<select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
+{% for user in user_list %}
+<option value="./chats?request_user={{user[0]}}">{{user[0]}}</option>
+{% end %}
+</select>
+</form></p>
+</font>
+
+
+<FONT size="5"><p>Group<br></FONT>
+
+<select size="10" name="Group" style="width: 150px">
+
+
+{% for group in group_list %}
+<option value={{group[0]}}>{{group[0]}}</option>
+{% end %}
+</select></p>
+</div>
+<!-- ナビゲーション終了 -->
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
         <FONT size="5"><p>Group<br></FONT>
           <form name="group">
@@ -282,6 +392,7 @@
             <div id="chat_div" class="chat"></div>
 
 
+<<<<<<< HEAD
           </div>
           <!-- メインカラム終了 -->
 
@@ -292,6 +403,15 @@
               <button id="button">send</button>
             </div></div>
             <!-- フッタ終了 -->
+=======
+<!-- フッタ開始 -->
+<div id="footer">
+<a href=/auth/logout>Logout</a>
+<div Align="right">
+<button id="button">送<br>信</button>
+</div></div>
+<!-- フッタ終了 -->
+>>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
 
           </div>

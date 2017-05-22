@@ -10,7 +10,9 @@ background-color: #ffffff; /* ページの背景色 */
 color: #000000; /* 全体の文字色 */
 font-size: 100%; /* 全体の文字サイズ */
 }
-
+h1{
+ margin-top: 0px;
+}
 /* --- 全体のリンクテキスト --- */
 a:link { color: #0000ff; }
 a:visited { color: #800080; }
@@ -30,6 +32,7 @@ overflow:hidden;
 
 /* --- ヘッダ --- */
 #header {
+  margin-top: 0;
 background-color: #ffe080; /* ヘッダの背景色 */
 height: 20vh;
 }

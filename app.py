@@ -18,6 +18,8 @@ from tornado.web import url
 import os
 import logging
 import db
+import datetime
+import time
 
 define("port", default=5000, type=int)
 define("username", default="user")
@@ -184,17 +186,14 @@ class ChatHandler(BaseHandler):
         print(self.waiters)
         for waiter in self.waiters:
             print(waiter)
-            # if waiter[0] == self:
-            #     continue
-            # waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': to_user ,'from_user':self.get_current_user() , 'my_name':self.get_current_user()})
-            # print("Sended:"+waiter[1])
             if waiter[0] == self:
                continue
             if group_flag == False:
                 print(db.get_user_id_from_name(to_user))
                 if waiter[1] != db.get_user_id_from_name(message["to_user"]):
                     continue
-                waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
+                if self.check_active_time(message["to_user"],message):
+                    waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':self.get_current_user() , 'my_name':self.get_current_user() , 'is_group':'False'})
             else:
                 group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
                 for number in group_user_list:
@@ -205,6 +204,28 @@ class ChatHandler(BaseHandler):
             
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
+
+    def check_active_time(self,reseiver,message):
+        active_time = db.get_active_time(reseiver)
+        #print(str(active_time[0][0][0:2]))
+        now = datetime.time(datetime.datetime.now().hour,datetime.datetime.now().minute,0)
+        #start = now.strptime(str(active_time[0][0]), '%H:%M')
+        #end = now.strptime(str(active_time[0][1]), '%H:%M')
+        start = datetime.time(int(str(active_time[0][0][0:2])),int(str(active_time[0][0][3:5])),0)
+        end = datetime.time(int(str(active_time[0][1][0:2])),int(str(active_time[0][1][3:5])),0)
+        
+        print("check_active_time")
+        print(start)
+        print(end)
+        print(now)
+        if(start <= now and now <= end):
+            return True
+        else:
+            text = "System message:"+message["to_user"]+" is not in active.So your massage is not delivered to "+message["to_user"]+".Your massage is still with system."
+            self.write_message({'img_path': message['img_path'], 'message': text , 'to_user': self.get_current_user() ,'from_user': message["to_user"], 'my_name':self.get_current_user() , 'is_group':'False'})
+            return False
+
+
 
 
 def main():

@@ -4,6 +4,17 @@ from datetime import datetime
 #SQL文を実行する場合はself.execute_sql(sql)を呼ぶこと
 BOT_ID = 5
 
+def get_active_time(resiever):
+	result = execute_sql("select Active_Time_start,Active_time_end from \'user\' where Name= \""+ str(resiever)+"\"")
+	print(result)
+	active_time=[]
+	for i in result:
+		active_time.append(i)
+	if len(i)!=2:
+		return None
+	else:
+		return result
+
 
 def get_group_user_list(Group_id):
 	result = execute_sql("select User_ID from \'group\' where Group_id = "+ str(Group_id))

@@ -34,16 +34,11 @@ class Application(tornado.web.Application):
             (r'/chats*',MainHandler),
             (r'/auth/login', AuthLoginHandler),
             (r'/auth/logout', AuthLogoutHandler),
-<<<<<<< HEAD
-            (r'/chat/*', ChatHandler),
+            (r'/chat/', ChatHandler),
             (r'/chats*',MainHandler),
             (r'/permission_deny',ErrorHandler),
             (r'/setting',SettingHandler),
             (r'/creategroupe*',CreateGroupeHandler),
-=======
-            (r'/setting',SettingHandler),
-            (r'/chat', ChatHandler),
->>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -203,26 +198,26 @@ class ChatHandler(BaseHandler):
         print(self)
         self.waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
         self.messages=[]
-<<<<<<< HEAD
-
-        if(group_flag == False):
-
-            for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
-                #print(message)
-                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
-            self.write_message({'messages': self.messages})
-        else:
-            for message in db.get_group_message(db.get_group_id_from_name(to_user)):
-                #print(message)
-                self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
-            self.write_message({'messages': self.messages})
-
-=======
-        for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
-            #print(message)
-            self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
-        self.write_message({'messages': self.messages})
->>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
+# <<<<<<< HEAD
+#
+#         if(group_flag == False):
+#
+#             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
+#                 #print(message)
+#                 self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
+#             self.write_message({'messages': self.messages})
+#         else:
+#             for message in db.get_group_message(db.get_group_id_from_name(to_user)):
+#                 #print(message)
+#                 self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
+#             self.write_message({'messages': self.messages})
+#
+# =======
+#         for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
+#             #print(message)
+#             self.messages.append({'img_path': '/static/images/lion.gif', 'message': message[4]})
+#         self.write_message({'messages': self.messages})
+# >>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
     def on_message(self, message):#メーッセージ受信およびブロードキャスト
         global to_user
@@ -232,16 +227,16 @@ class ChatHandler(BaseHandler):
         print("on_message")
         print(message)
         print(self.get_current_user())
-<<<<<<< HEAD
-        if(group_flag==False):
-            db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-            #self.messages.append(message)
-        else:
-            db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-=======
-        db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
-        #self.messages.append(message)
->>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
+# <<<<<<< HEAD
+#         if(group_flag==False):
+#             db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+#             #self.messages.append(message)
+#         else:
+#             db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+# =======
+#         db.insert_message(db.get_user_id_from_name(to_user), db.get_user_id_from_name(self.get_current_user()), db.get_now_time(),message['message'], 0)
+#         #self.messages.append(message)
+# >>>>>>> 7a3b9c29541367eec40f53629e9dff28ac6c91f4
 
         print(to_user)
         print(group_flag)

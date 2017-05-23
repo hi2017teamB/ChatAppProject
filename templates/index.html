@@ -12,18 +12,18 @@
 
 
   <script>
-  var socket = new WebSocket('ws://' + location.host + '/chat');
-  function sendAction(img_path, msg ,to_user) {
-    var message = {
-      img_path: img_path,
-      message: msg,
-      to_user: to_user
-    };
-    socket.send(JSON.stringify(message));
-  }
-  function getUrlVars(){
-    var vars = [], max = 0, hash = "", array = "";
-    var url = window.location.search;
+    var socket = new WebSocket('ws://' + location.host + '/chat');
+    function sendAction(img_path, msg ,to_user) {
+      var message = {
+        img_path: img_path,
+        message: msg,
+        to_user: to_user
+      };
+      socket.send(JSON.stringify(message));
+    }
+    function getUrlVars(){
+      var vars = [], max = 0, hash = "", array = "";
+      var url = window.location.search;
 
     //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
     hash  = url.slice(1).split('&');
@@ -82,17 +82,17 @@
     var content_width = $("#content").width();
     var content_height = $("#content").height();
     $("#chat_div").chatbox(
-      {id : "chat_div",
-      title : " ",
-      user : "hoge",
-      offset: content_off.left,
-      width: content_width-40,
-      messageSent: function(id, user, msg){
-        var img_path = $('#face').attr('src');
-        this.boxManager.addMsg(img_path, msg, true);
-        val = getUrlVars()
-        sendAction(img_path, msg,val[is_group]);
-      }});
+                           {id : "chat_div",
+                           title : " ",
+                           user : "hoge",
+                           offset: content_off.left,
+                           width: content_width-40,
+                           messageSent: function(id, user, msg){
+                            var img_path = $('#face').attr('src');
+                            this.boxManager.addMsg(img_path, msg, true);
+                            val = getUrlVars()
+                            sendAction(img_path, msg,val[is_group]);
+                          }});
       // var offset = $("#content").chatbox("option", "offset");
       //
       // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
@@ -101,7 +101,7 @@
       //  $("#chat_div").chatbox(offset, content_off-5, 500);
     });
 
-    $(function(){
+  $(function(){
       $('.modal-open').click(function(){// 「.modal-open」をクリック
         $('body').append('<div class="modal-overlay"></div>');// オーバーレイ用の要素を追加
         $('.modal-overlay').fadeIn('slow');  // オーバーレイをフェードイン
@@ -141,37 +141,46 @@
     });
 
 
-    function group_create(){
-      var str;
-      var group_member = "";
-      var group_name;
-      if(document.group_name_text.create_group_name.value != ""){
-        group_name = document.group_name_text.create_group_name.value;
-        str="Create OK?"
-        for (var i=0;i<document.menber.elements.length;i++){
-          if( document.menber.elements[i].checked )
-          {
-            group_member+=document.menber.elements[i].value+",";
-            str = str+"\n"+document.menber.elements[i].value
-          }
+  function group_create(){
+    var str;
+    var group_member = "";
+    var group_name;
+    if(document.group_name_text.create_group_name.value != ""){
+      group_name = document.group_name_text.create_group_name.value;
+      str="Create OK?"
+      for (var i=0;i<document.menber.elements.length;i++){
+        if( document.menber.elements[i].checked )
+        {
+          group_member+=document.menber.elements[i].value+",";
+          str = str+"\n"+document.menber.elements[i].value
         }
-
-        str = str+"\n"+"groupe name:"+document.group_name_text.create_group_name.value
-        ret = confirm(str);
-        if (ret == true){
-          location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
-        }
-
       }
-      else if(document.group_name_text.create_group_name.value == ""){
-        ret = confirm("group name is not setted.");
+
+      str = str+"\n"+"groupe name:"+document.group_name_text.create_group_name.value
+      ret = confirm(str);
+      if (ret == true){
+        location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
       }
+
     }
+    else if(document.group_name_text.create_group_name.value == ""){
+      ret = confirm("group name is not setted.");
+    }
+  }
 
-    function group_delete(){
-      var group_name;
-      var str
-      group_name = $('#group_list [name=group_list] option:selected').text();
+  function set_active_time(){
+        start_h = $('#active_time [name=start_h] option:selected').text();
+        start_m = $('#active_time [name=start_m] option:selected').text();
+        end_h = $('#active_time [name=end_h] option:selected').text();
+        end_m = $('#active_time [name=end_m] option:selected').text();
+
+        location.href = "./set_active_time?start="+start_h+":"+start_m+"&"+"end="+end_h+":"+end_m
+  }
+
+  function group_delete(){
+    var group_name;
+    var str
+    group_name = $('#group_list [name=group_list] option:selected').text();
       //group_name =document.group_list.group_list.val;
 
       str = "Delete "+ group_name + " OK ?"
@@ -189,148 +198,338 @@
 
 
 
-    </script>
-  </head>
+  </script>
+</head>
 
-  <body>
-
-
-
-    <!-- コンテナ開始 -->
-    <div id="container">
-
-
-      <!-- ヘッダ開始 -->
-
-      <div id="header">
-
-        <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
-        <br>
-        You are log in as {{user_name}}.<br>
-
-
-        <!-- Autocomplete -->
-
-        <div Align="right">
-          <div role="main" class="ui-content">
-            <form method="POST" action="">
-              <div class="ui-field-contain">
-                <label for="entry_book">template：</label>
-                <select id="entry_book" name="entry_book">
-                  <option value="otu">お疲れ様です</option>
-                  <option value="hello">こんにちは</option>
-                </select>
-              </div>
-            </form><button id="button">挿入</button>
-          </div>
+<body>
 
 
 
+  <!-- コンテナ開始 -->
+  <div id="container">
 
+
+    <!-- ヘッダ開始 -->
+
+    <div id="header">
+
+      <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
+      <br>
+      You are log in as {{user_name}}.<br>
+
+
+      <!-- Autocomplete -->
+
+      <div Align="right">
+        <div role="main" class="ui-content">
+          <form method="POST" action="">
+            <div class="ui-field-contain">
+              <label for="entry_book">template：</label>
+              <select id="entry_book" name="entry_book">
+                <option value="otu">お疲れ様です</option>
+                <option value="hello">こんにちは</option>
+              </select>
+            </div>
+          </form><button id="button">挿入</button>
         </div>
+
+
+
+
       </div>
-      <!-- ヘッダ終了 -->
+    </div>
+    <!-- ヘッダ終了 -->
 
-      <!-- ナビゲーション開始 -->
-      <div id="nav">
+    <!-- ナビゲーション開始 -->
+    <div id="nav">
 
-        <form action="#">
-          <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
-        </form>
+      <form action="#">
+        <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
+      </form>
 
-        <input type="button" value="setting" data-target="con1" class="modal-open">
+      <input type="button" value="setting" data-target="con1" class="modal-open">
 
-        <div id="con1" class="modal-content">
-          <body>
-            <h2>Setting window</h2>
-            <li>Group create</li>
-            <ul>
-              <form name="menber" >
-                <input type="checkbox" value="{{my_name}}">{{my_name}}
-                {% for user in user_list %}
-                <br><input type="checkbox" value="{{user}}">{{user}}
-                {% end %}
+      <div id="con1" class="modal-content">
+        <body>
+          <h2>Setting window</h2>
+          <li>Active Time</li>
+          <ul>
+            <form id ="active_time">
+              <select name="start_h" id="selectedate-h">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+              </select>
+              :
+              <select name="start_m" id="selectedate-m">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="37">37</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+                <option value="46">46</option>
+                <option value="47">47</option>
+                <option value="48">48</option>
+                <option value="49">49</option>
+                <option value="50">50</option>
+                <option value="51">51</option>
+                <option value="52">52</option>
+                <option value="53">53</option>
+                <option value="54">54</option>
+                <option value="55">55</option>
+                <option value="56">56</option>
+                <option value="57">57</option>
+                <option value="58">58</option>
+                <option value="59">59</option>
+              </select>
+              ~
+              <select name="end_h" id="selectedate-h">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+              </select>
+              :
+              <select name="end_m" id="selectedate-m">
+                <option value="00">00</option>
+                <option value="01">01</option>
+                <option value="02">02</option>
+                <option value="03">03</option>
+                <option value="04">04</option>
+                <option value="05">05</option>
+                <option value="06">06</option>
+                <option value="07">07</option>
+                <option value="08">08</option>
+                <option value="09">09</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+                <option value="32">32</option>
+                <option value="33">33</option>
+                <option value="34">34</option>
+                <option value="35">35</option>
+                <option value="36">36</option>
+                <option value="37">37</option>
+                <option value="38">38</option>
+                <option value="39">39</option>
+                <option value="40">40</option>
+                <option value="41">41</option>
+                <option value="42">42</option>
+                <option value="43">43</option>
+                <option value="44">44</option>
+                <option value="45">45</option>
+                <option value="46">46</option>
+                <option value="47">47</option>
+                <option value="48">48</option>
+                <option value="49">49</option>
+                <option value="50">50</option>
+                <option value="51">51</option>
+                <option value="52">52</option>
+                <option value="53">53</option>
+                <option value="54">54</option>
+                <option value="55">55</option>
+                <option value="56">56</option>
+                <option value="57">57</option>
+                <option value="58">58</option>
+                <option value="59">59</option>
+              </select>
+            </form>
+
+            <input name="set_active_time" type="button" value="Setting" class="modal-close" onClick="set_active_time();">
+            <!-- location.reload();-->
+            <br><br>
+          </ul>
+
+
+          <li>Group create</li>
+          <ul>
+            <form name="menber" >
+              <input type="checkbox" value="{{my_name}}">{{my_name}}
+              {% for user in user_list %}
+              <br><input type="checkbox" value="{{user}}">{{user}}
+              {% end %}
+            </form>
+            <form name="group_name_text" >
+              Group name:<input type="text" id="create_group_name" name="create_group_name" size="15" maxlength="20">
+            </form>
+            <br>
+
+            <input name="group_create" type="button" value="Create" class="modal-close" onClick="group_create();">
+            <!-- location.reload();-->
+            <br><br>
+          </ul>
+          <li>Group delete</li>
+          <ul>
+
+            <form id ="group_list">
+              <select name="group_list" >
+                <option value="-1" id="deleate_group_name" selected>select group name</option>
+                {% for group in group_list %}
+                <option value="{{group[0]}}" id="deleate_group_name">{{group[0]}}
+                  {% end %}
+                </select>
               </form>
-              <form name="group_name_text" >
-                Group name:<input type="text" id="create_group_name" name="create_group_name" size="15" maxlength="20">
-              </form>
-              <br>
 
-              <input name="group_create" type="button" value="Create" class="modal-close" onClick="group_create();">
+              <input name="group_delete" type="button" value="Delete" class="modal-close" onClick="group_delete();">
               <!-- location.reload();-->
               <br><br>
             </ul>
-            <li>Group delete</li>
+            <li>template create</li>
             <ul>
-
-              <form id ="group_list">
-                <select name="group_list" >
-                  <option value="-1" id="deleate_group_name" selected>select group name</option>
-                  {% for group in group_list %}
-                  <option value="{{group[0]}}" id="deleate_group_name">{{group[0]}}
-                    {% end %}
-                  </select>
-                </form>
-
-                <input name="group_delete" type="button" value="Delete" class="modal-close" onClick="group_delete();">
-                <!-- location.reload();-->
-                <br><br>
-              </ul>
-              <li>template create</li>
-              <ul>
-                template:
-                <form>
-                  <textarea name="template_message" rows="3" cols="50" wrap="hard">
-                  </textarea>
-                </form>
-              </ul>
-            </body>
-            <p><a class="modal-close">close</a></p>
-          </div>
-
-          <font size="5"><p>User<br>
-            <form name="test">
-              <select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
-                {% for user in user_list %}
-                <option value="./chats?request_user={{user}}">{{user}}</option>
-                {% end %}
-              </select>
-            </form></p>
-          </font>
-
-
-          <FONT size="5"><p>Group<br></FONT>
-            <form name="group">
-              <select size="10" name="group" style="width: 150px " onChange="redirect_group_mag()">
-                {% for group in group_list %}
-                <option value="./chats?request_group={{group[0]}}">{{group[0]}}</option>
-                {% end %}
-              </select></p>
-            </div>
-            <!-- ナビゲーション終了 -->
-
-            <!-- メインカラム開始 -->
-            <div id="content">
-
-              <img src="{{ img_path }}" id="face" style="visibility:hidden">
-              <div id="chat_div" class="chat"></div>
-
-
-            </div>
-            <!-- メインカラム終了 -->
-
-            <!-- フッタ開始 -->
-            <div id="footer">
-              <a href=/auth/logout>Logout</a>
-              <div Align="right">
-                <button id="button">送<br>信</button>
-              </div></div>
-              <!-- フッタ終了 -->
-
-
-            </div>
-            <!-- コンテナ終了 -->
-
-
+              template:
+              <form>
+                <textarea name="template_message" rows="3" cols="50" wrap="hard">
+                </textarea>
+              </form>
+            </ul>
           </body>
-          </html>
+          <p><a class="modal-close">close</a></p>
+        </div>
+
+        <font size="5"><p>User<br>
+          <form name="test">
+            <select size="10" name="user" style="width: 150px " onChange="redirect_user_mag()">
+              {% for user in user_list %}
+              <option value="./chats?request_user={{user}}">{{user}}</option>
+              {% end %}
+            </select>
+          </form></p>
+        </font>
+
+
+        <FONT size="5"><p>Group<br></FONT>
+        <form name="group">
+          <select size="10" name="group" style="width: 150px " onChange="redirect_group_mag()">
+            {% for group in group_list %}
+            <option value="./chats?request_group={{group[0]}}">{{group[0]}}</option>
+            {% end %}
+          </select></p>
+        </div>
+        <!-- ナビゲーション終了 -->
+
+        <!-- メインカラム開始 -->
+        <div id="content">
+
+          <img src="{{ img_path }}" id="face" style="visibility:hidden">
+          <div id="chat_div" class="chat"></div>
+
+
+        </div>
+        <!-- メインカラム終了 -->
+
+        <!-- フッタ開始 -->
+        <div id="footer">
+          <a href=/auth/logout>Logout</a>
+          <div Align="right">
+            <button id="button">送<br>信</button>
+          </div></div>
+          <!-- フッタ終了 -->
+
+
+        </div>
+        <!-- コンテナ終了 -->
+
+
+      </body>
+      </html>

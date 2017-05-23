@@ -62,12 +62,23 @@
 		    var msgElement = document.createElement("p");
                     $(msgElement).text(msg);
 
+           read_response = true;
 		    if (is_left) {
+
 			$(msgElement).addClass("balloon-left");
+        if (read_response){
+          $(chat_div).append("<div align=\"right\"> understand </div><br>");
+        }
 		    } else {
 			$(msgElement).addClass("balloon-right");
+        if (read_response){
+          $(chat_div).append("<input type=\"button\" value=\"understand\" onclick=\"read_response()\"><div align=\"right\"> already read </div><br>");
 		    }
+}
                     e.appendChild(msgElement);
+
+
+
 		    var br = $("<br style='clear:both'/>");
 		    $(e).append(br);
                     $(e).css("maxWidth", $(box).width());
@@ -117,6 +128,7 @@
                           'ui-corner-top ' +
                           'ui-chatbox'
                          )
+
                 .attr('outline', 0)
                 .focusin(function() {
                     // ui-state-highlight is not really helpful here
@@ -173,18 +185,19 @@
             uiChatboxTitlebarMinimizeText = $('<span></span>')
                 .addClass('ui-icon ' +
                           'ui-icon-minusthick')
-                .text('-       ')
+                // .text('-       ')
                 .appendTo(uiChatboxTitlebarMinimize),
             // content
             uiChatboxContent = (self.uiChatboxContent = $('<div></div>'))
                 .addClass('ui-widget-content ' +
                           'ui-chatbox-content '
                          )
+
                 .appendTo(uiChatbox),
             uiChatboxLog = (self.uiChatboxLog = self.element)
                 .addClass('ui-widget-content ' +
                           'ui-chatbox-log'
-                         )
+                        )
                 .appendTo(uiChatboxContent),
             uiChatboxInput = (self.uiChatboxInput = $('<div></div>'))
                 .addClass('ui-widget-content ' +
@@ -193,6 +206,7 @@
                 .click(function(event) {
                     // anything?
                 })
+
                 .appendTo(uiChatboxContent),
             uiChatboxInputBox = (self.uiChatboxInputBox = $('<textarea></textarea>'))
                 .addClass('ui-widget-content ' +
@@ -210,6 +224,7 @@
                         return false;
                     }
                 })
+
                 .focusin(function() {
                     uiChatboxInputBox.addClass('ui-chatbox-input-focus');
                     var box = $(this).parent().prev();

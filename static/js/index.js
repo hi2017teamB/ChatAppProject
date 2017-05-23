@@ -13,4 +13,3 @@ function redirect_group_mag(){
   href = obj.options[index].value;
   location.href = href;
 }
-

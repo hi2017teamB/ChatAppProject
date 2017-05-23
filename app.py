@@ -28,6 +28,8 @@ define("password", default="pass")
 global to_user
 global group_flag
 
+global read_response
+
 class Application(tornado.web.Application):
 
     def __init__(self):
@@ -76,12 +78,8 @@ class MainHandler(BaseHandler):
     def get(self, *args, **kwargs):
         global group_flag
         is_permit=True
-        face_pics = ['cat.gif', 'fere.gif', 'lion.gif']
         user=self.get_current_user()
         img_name = user + '.gif'
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        print(img_name)
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
         group_list=[]
         global to_user
         try:
@@ -219,9 +217,7 @@ class ChatHandler(BaseHandler):
         print(self)
         self.waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
         self.messages=[]
-
         if(group_flag == False):
-
             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
                 #print(message)
                 self.messages.append({'img_path': '/static/images/'+db.get_user_name(message[2])+'.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
@@ -231,6 +227,7 @@ class ChatHandler(BaseHandler):
                 #print(message)
                 self.messages.append({'img_path': '/static/images/'+db.get_user_name(message[2])+'.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
             self.write_message({'messages': self.messages})
+
 
 
     def on_message(self, message):#メーッセージ受信およびブロードキャスト
@@ -269,6 +266,7 @@ class ChatHandler(BaseHandler):
                         if waiter[0] == self:
                             continue
                         waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': self.get_current_user(), 'my_name':db.get_user_name(number) , 'is_group':'True'})
+
 
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
 

@@ -81,7 +81,7 @@ div.balloon-wrapper::after {
 
 /* balloon left */
 .balloon-left {
-/*	       float: left;*/
+	       float: left;
 	       float: right;
 	       margin-right: 15px;
 	       border-color: #888888;
@@ -121,8 +121,8 @@ img {
   -webkit-border-radius: 75px;
   -moz-border-radius: 75px;
   background-color:white;
-  box-shadow: 0px 0px 0px 3px #C0C0C0;
-  -moz-box-shadow: 0px 0px 0px 3px #C0C0C0;
-  -webkit-box-shadow: 0px 0px 0px 3px #C0C0C0;
+  box-shadow: 0px 0px 0px 3px #87CEEB;
+  -moz-box-shadow: 0px 0px 0px 3px #87CEEB;
+  -webkit-box-shadow: 0px 0px 0px 3px #87CEEB;
   margin-top: 5px;
 }

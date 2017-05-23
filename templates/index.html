@@ -86,7 +86,6 @@
     var content_width = $("#content").width();
     var content_height = $("#content").height();
     $("#chat_div").chatbox(
-
       {id : "chat_div",
       title : " ",
       user : "hoge",
@@ -99,6 +98,7 @@
         val = getUrlVars()
         sendAction(img_path, msg,val[is_group]);
       }});
+
 
       // var offset = $("#content").chatbox("option", "offset");
       //
@@ -169,6 +169,7 @@
         location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
       }
 
+
     }
     else if(document.group_name_text.create_group_name.value == ""){
       ret = confirm("group name is not setted.");
@@ -211,6 +212,7 @@
     }
 
 
+
     </script>
   </head>
 
@@ -218,7 +220,6 @@
 
   <!-- コンテナ開始 -->
   <div id="container">
-
 
     <!-- ヘッダ開始 -->
 
@@ -538,11 +539,8 @@
               </div></div>
               <!-- フッタ終了 -->
 
-
-
         </div>
         <!-- コンテナ終了 -->
-
 
       </body>
       </html>

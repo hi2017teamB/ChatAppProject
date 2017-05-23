@@ -49,6 +49,9 @@ def get_user_list():
 	print(user_list)
 	return user_list
 
+def get_user_id_list():
+	return execute_sql("select User_ID from User where User_ID <>" + str(BOT_ID))
+
 def get_group_list():
 	return execute_sql("select Name from \'Group\'")
 
@@ -117,10 +120,17 @@ def change_flag(bot_id, flag):
 	return
 
 def get_unread_message_for_bot():
-	result = execute_sql("select Text from Talk where Talk.'To_id' = " + str(BOT_ID) + " and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
-	# a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where Talk.'To' = \"" + str(BOT_ID) + "\" and (Talk.Read_User IS NULL or Talk.Read_User != \"" + str(BOT_ID) + "\")")
+	result = execute_sql("select Text from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
+	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where To_id = \"" + str(BOT_ID) + "\" and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 
+def insert_reminder(message, month, month_end, week, week_number, start_datetime, to, in_lab, flag):
+	execute_sql("insert into Bot (Message, Month, Month_end, Week, Week_number, start_datetime, \'To\', In_Lab, Flag) values (\"" + message +"\","+ str(month) +","+ str(month_end) +","+ str(week) +","+ str(week_number) +",\""+ start_datetime +"\",\""+ to +"\","+ str(in_lab) +","+ str(flag) + ")")
+	return
+
+def change_start_datetime(bot_id, next_datetime):
+	result = execute_sql("update bot set Start_datetime = \"" + next_datetime + "\" where Bot_id = " + str(bot_id))
+	return
 
 
 def execute_sql(sql):

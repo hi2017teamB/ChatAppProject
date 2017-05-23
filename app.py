@@ -42,6 +42,7 @@ class Application(tornado.web.Application):
             (r'/permission_deny',ErrorHandler),
             (r'/creategroupe*',CreateGroupeHandler),
             (r'/deletegroupe*',DeleteGroupeHandler),
+            (r'/set_active_time*',Set_active_time_hander),
         ]
         settings = dict(
             cookie_secret='gaofjawpoer940r34823842398429afadfi4iias',
@@ -115,6 +116,12 @@ class MainHandler(BaseHandler):
 class ErrorHandler(BaseHandler):
     def get(self):
         self.render("permission_deny.html")
+
+
+class Set_active_time_hander(BaseHandler):
+    def get(self):
+        db.update_active_time(self.get_argument("start"),self.get_argument("end"),self.get_current_user())
+        self.redirect("/")
 
 class CreateGroupeHandler(BaseHandler):
     def get(self):

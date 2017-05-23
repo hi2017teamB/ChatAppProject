@@ -211,7 +211,11 @@
       $(this).val('');
     }
 
+    function set_read_response(){
+        //  talk_id=1;
 
+          location.href = "./set_read_response?"+talk_id
+    }
 
     </script>
   </head>
@@ -535,7 +539,7 @@
               <a href=/auth/logout>Logout</a>
               <div  valign="bottom">
                 <button id="send_button" onclick="send_message()">send</button>
-                <button id="send_button_with_response" onclick="send_message_with_response(peer, msg, is_left)">send with response</button>
+                <button id="send_button_with_response" onclick="set_read_response(peer, msg, is_left)">send with response</button>
               </div></div>
               <!-- フッタ終了 -->
 

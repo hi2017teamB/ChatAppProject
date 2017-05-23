@@ -72,7 +72,7 @@
 		    } else {
 			$(msgElement).addClass("balloon-right");
         if (read_response){
-          $(chat_div).append("<input type=\"button\" value=\"understand\" onclick=\"read_response()\"><div align=\"right\"> already read </div><br>");
+          $(chat_div).append("<input type=\"button\" value=\"understand\" onclick=\"understand()\"><div align=\"right\"> already read </div><br>");
 		    }
 }
                     e.appendChild(msgElement);

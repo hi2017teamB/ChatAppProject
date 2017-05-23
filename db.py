@@ -4,6 +4,9 @@ from datetime import datetime
 #SQL文を実行する場合はself.execute_sql(sql)を呼ぶこと
 BOT_ID = 5
 
+def set_read_response(talk_id):
+	execute_sql("update talk set Read_Res = 1 where Talk_ID = 'talk_id'")
+
 def update_active_time(start,end,user):
 	#print("update user set Active_time_start = ¥'"+start+"¥' Active_time_end= ¥'"+end+"¥' where name = "+user)
 	execute_sql("update user set Active_time_start = '"+start+"' ,Active_time_end= '"+end+"' where name = '"+user+"'")

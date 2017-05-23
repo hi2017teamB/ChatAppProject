@@ -4,6 +4,20 @@ from datetime import datetime
 #SQL文を実行する場合はself.execute_sql(sql)を呼ぶこと
 BOT_ID = 5
 
+def get_my_active_time(user):
+	result = execute_sql("select Active_Time_start,Active_Time_end from user where name = '"+user+"'")
+	active_time_text = result[0][0]+"~"+result[0][1]
+	return active_time_text
+
+def get_all_active_time():
+	result = execute_sql("select Name,Active_Time_start,Active_Time_end from user")
+	active_time=[]
+	for i in result:
+		active_time_text = i[0]+":"+i[1]+"~"+i[2]
+		active_time.append(active_time_text)
+	return active_time
+
+
 def set_read_response(talk_id):
 	execute_sql("update talk set Read_Res = 1 where Talk_ID = 'talk_id'")
 

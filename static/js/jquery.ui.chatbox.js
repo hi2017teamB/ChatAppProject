@@ -62,18 +62,27 @@
 		    var msgElement = document.createElement("p");
                     $(msgElement).text(msg);
 
+          already_read = true;
            read_response = true;
 		    if (is_left) {
 
 			$(msgElement).addClass("balloon-left");
         if (read_response){
-          $(chat_div).append("<div align=\"right\"> understand </div><br>");
+          $(chat_div).append("<div align=\"right\">~~~~~~ understand </div>");
+        }
+        if (already_read){
+          $(chat_div).append("<div align=\"right\">~~~~~ already read </div><br>");
         }
 		    } else {
 			$(msgElement).addClass("balloon-right");
         if (read_response){
-          $(chat_div).append("<input type=\"button\" value=\"understand\" onclick=\"understand()\"><div align=\"right\"> already read </div><br>");
+          $(chat_div).append("<div align=\"left\">~~~~~~ understand <input type=\"button\" value=\"I understand\" onclick=\"understand()\"></div>");
 		    }
+        if (already_read){
+          $(chat_div).append("<div align=\"left\">~~~~~ already read </div><br>");
+        }
+
+
 }
                     e.appendChild(msgElement);
 

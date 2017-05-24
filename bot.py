@@ -249,6 +249,9 @@ def calc_startday(s_flag, days):
             #     except ValueError:
             #         return False
         elif "日" in day :
+            pattern = "(?P<day>[0-9]{1,2})日"
+            match = re.search(pattern, day)
+            d = int(match.group("day"))
             try:
                 input_day = date(today.year, today.month, d)
             except ValueError:

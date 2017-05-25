@@ -11,8 +11,29 @@ from syntax import Syntax
 from dateutil.dateutil.relativedelta import relativedelta
 from dateutil.dateutil.rrule import *
 from dateutil.dateutil.parser import *
+from websocket import create_connection
+import sys
+import json
+
 
 BOT_ID = 5
+
+def send_massage(to_user,message_text):
+        #コネクションを張る
+    ws = create_connection("ws://localhost:8008/bot_only")
+    send_to="This message send to "
+    for i in to_user:
+        send_to += i+","
+
+    for i in to_user:
+        message = {
+            "img_path": "/static/images/bot.gif",
+            "message": send_to[0:len(send_to)-1]+":"+message_text,
+            "to_user": i
+        }
+        ws.send(json.dumps(message))
+    #メッセージを送信
+    
 
 def match_schedule(r):
     flag = False
@@ -352,5 +373,5 @@ if __name__ == '__main__':
                 # print("failed1")
         # print (datetime.now().weekday())
 
-
+        send_massage(["konishi","tanaka","shirasawa"],"botです")
         time.sleep(1);

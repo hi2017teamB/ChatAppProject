@@ -120,7 +120,7 @@ def change_flag(bot_id, flag):
 	return
 
 def get_unread_message_for_bot():
-	result = execute_sql("select Text from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
+	result = execute_sql("select Text,from_id from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where To_id = \"" + str(BOT_ID) + "\" and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 

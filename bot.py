@@ -97,6 +97,11 @@ def enter_schedule():
     for message in messages:
         print(message)
         s = syntax_matching(message[0])
+        print(s)
+        if s == False:
+            send_massage([db.get_user_name(message[1])],"文法エラーです")
+
+
         #print(s)
         if s.span is None:
             s.span=""
@@ -362,8 +367,12 @@ if __name__ == '__main__':
 
                     print(members)
                     # メッセージ送信
+                    user_name_list = []
                     for member in members:
                         db.insert_message(member, BOT_ID, datetime.now().strftime('%Y/%m/%d-%H:%M:%S'), result[1], 0)
+                        user_name_list.append(db.get_user_name(member))
+
+                    send_massage(user_name_list,result[1])
 
                     db.change_flag(result[0], 0)
 
@@ -373,5 +382,5 @@ if __name__ == '__main__':
                 # print("failed1")
         # print (datetime.now().weekday())
 
-        send_massage(["konishi","tanaka","shirasawa"],"botです")
-        time.sleep(1);
+        #send_massage(["konishi","tanaka","shirasawa"],"ボットの自動送信機能のテストです")
+        time.sleep(10000);

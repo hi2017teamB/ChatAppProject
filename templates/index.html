@@ -90,7 +90,7 @@
       title : " ",
       user : "hoge",
       offset: content_off.left,
-      width: content_width-40,
+      width: content_width-10,
       messageSent: function(id, user, msg){
 
         var img_path = $('#face').attr('src');
@@ -103,8 +103,8 @@
       // var offset = $("#content").chatbox("option", "offset");
       //
       // $("#chat_div").offset({ top: content_off.top, left: content_off.left });
-      $("#chat_div").width(content_width-40);
-      $("#chat_div").height(content_height-2);
+      $("#chat_div").width(content_width-10);
+      $("#chat_div").height(content_height-4);
       //  $("#chat_div").chatbox(offset, content_off-5, 500);
     });
 
@@ -222,6 +222,13 @@ read_response=true;
           location.href = "./set_read_response?"+talk_id
     }
 
+    function insert_template(){
+
+
+    }
+
+
+
     </script>
   </head>
 
@@ -241,7 +248,7 @@ read_response=true;
 
       <!-- Autocomplete -->
 
-      <div Align="right">
+      <!-- <div Align="right">
         <div role="main" class="ui-content">
           <form method="POST" action="">
             <div class="ui-field-contain">
@@ -257,7 +264,7 @@ read_response=true;
 
 
 
-      </div>
+      </div> -->
     </div>
     <!-- ヘッダ終了 -->
 

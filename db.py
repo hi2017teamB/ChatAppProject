@@ -50,6 +50,7 @@ def get_group_user_list(Group_id):
 	return user_list
 
 def get_message(to_id,from_id):
+	execute_sql("update Talk set Read_User = \"" + to_id + "\" where From_id =" + from_id + " and To_id =" + to_id + " and Read_User IS NULL")
 	return execute_sql("select * from talk where (To_id = "+to_id+" and From_id="+from_id+") or (To_id ="+from_id+" and From_id ="+to_id+") order by Talk_ID")
 
 def get_group_message(group_id):
@@ -137,7 +138,7 @@ def change_flag(bot_id, flag):
 	return
 
 def get_unread_message_for_bot():
-	result = execute_sql("select Text from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
+	result = execute_sql("select Text,from_id from Talk where To_id = " + str(BOT_ID) + " and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	a = execute_sql("update Talk set Read_User = \"" + str(BOT_ID) + "\" where To_id = \"" + str(BOT_ID) + "\" and (Read_User IS NULL or Read_User != \"" + str(BOT_ID) + "\")")
 	return result
 

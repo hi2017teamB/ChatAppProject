@@ -11,8 +11,29 @@ from syntax import Syntax
 from dateutil.dateutil.relativedelta import relativedelta
 from dateutil.dateutil.rrule import *
 from dateutil.dateutil.parser import *
+from websocket import create_connection
+import sys
+import json
+
 
 BOT_ID = 5
+
+def send_massage(to_user,message_text):
+        #コネクションを張る
+    ws = create_connection("ws://localhost:8008/bot_only")
+    send_to="This message send to "
+    for i in to_user:
+        send_to += i+","
+
+    for i in to_user:
+        message = {
+            "img_path": "/static/images/bot.gif",
+            "message": send_to[0:len(send_to)-1]+":"+message_text,
+            "to_user": i
+        }
+        ws.send(json.dumps(message))
+    #メッセージを送信
+
 
 def match_schedule(r):
     flag = False
@@ -76,6 +97,15 @@ def enter_schedule():
     for message in messages:
         print(message)
         s = syntax_matching(message[0])
+        print(s)
+        if s == False:
+            send_massage([db.get_user_name(message[1])],"文法エラーです")
+            return
+        else:
+            send_massage([db.get_user_name(message[1])],message[0]+"します")
+
+
+
         #print(s)
         if s.span is None:
             s.span=""
@@ -249,6 +279,9 @@ def calc_startday(s_flag, days):
             #     except ValueError:
             #         return False
         elif "日" in day :
+            pattern = "(?P<day>[0-9]{1,2})日"
+            match = re.search(pattern, day)
+            d = int(match.group("day"))
             try:
                 input_day = date(today.year, today.month, d)
             except ValueError:
@@ -285,7 +318,7 @@ def span_flag(span):
 
 
 def syntax_matching(message):
-    pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に?(?P<item>\S+)をリマインド$"
+    pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に(?P<item>\S+)をリマインド$"
     #pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に?(?P<item>\S+)をリマインド$"
     match = re.search(pattern, message)
 
@@ -338,8 +371,12 @@ if __name__ == '__main__':
 
                     print(members)
                     # メッセージ送信
+                    user_name_list = []
                     for member in members:
                         db.insert_message(member, BOT_ID, datetime.now().strftime('%Y/%m/%d-%H:%M:%S'), result[1], 0)
+                        user_name_list.append(db.get_user_name(member))
+
+                    send_massage(user_name_list,result[1])
 
                     db.change_flag(result[0], 0)
 
@@ -349,5 +386,5 @@ if __name__ == '__main__':
                 # print("failed1")
         # print (datetime.now().weekday())
 
-
+        #send_massage(["konishi","tanaka","shirasawa"],"ボットの自動送信機能のテストです")
         time.sleep(1);

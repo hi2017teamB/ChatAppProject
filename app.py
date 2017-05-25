@@ -20,6 +20,7 @@ import logging
 import db
 import datetime
 import time
+import sqlite3
 
 define("port", default=5000, type=int)
 define("username", default="user")
@@ -27,6 +28,7 @@ define("password", default="pass")
 
 global to_user
 global group_flag
+global waiters
 
 global read_response
 
@@ -39,6 +41,7 @@ class Application(tornado.web.Application):
             (r'/auth/logout', AuthLogoutHandler),
             (r'/chat/*', ChatHandler),
             (r'/chats*',MainHandler),
+            (r'/bot_only*',BotHandler),
             (r'/permission_deny',ErrorHandler),
             (r'/creategroupe*',CreateGroupeHandler),
             (r'/deletegroupe*',DeleteGroupeHandler),
@@ -58,6 +61,8 @@ class Application(tornado.web.Application):
 
 class BaseHandler(tornado.websocket.WebSocketHandler):
     #tornado.web.RequestHandler,
+    global waiters
+    waiters = []
     cookie_username = "username"
 
     def get_current_user(self):
@@ -112,7 +117,7 @@ class MainHandler(BaseHandler):
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
         if(is_permit):
-            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time())
+            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time(),readed_user="tanaka")
 
 class ErrorHandler(BaseHandler):
     def get(self):
@@ -201,9 +206,12 @@ class AuthLoginHandler(BaseHandler):
 
         logging.debug('AuthLoginHandler:post %s %s' % (username, password))
         user_id = db.get_user_id(username,password)
+
         if user_id!=None:
             self.set_current_user(username)
+
             self.redirect('/')
+
         else:
             self.render("login_error.html")
 
@@ -212,22 +220,135 @@ class AuthLogoutHandler(BaseHandler):
 
     def get(self):
         self.clear_current_user()
+
         self.redirect('/')
 
 
-class ChatHandler(BaseHandler):
-    waiters = []
+class BotHandler(BaseHandler):
     messages = []
 
     def open(self, *args, **kwargs):#初期メッセージ送信
         global to_user
         global group_flag
+        global waiters
+
+        print("open")
+        print(self)
+        waiters.append([self,db.get_user_id_from_name("bot")])
+        self.messages=[]
+
+        # if(group_flag == False):
+
+        # for message in db.get_message(db.get_user_id_from_name(),db.get_user_id_from_name(self.get_current_user())):
+        #     #print(message)
+        #     self.messages.append({'img_path': '/static/images/'+db.get_user_name(message[2])+'.gif', 'message': message[4] , 'to_user': db.get_user_name(message[1]) , 'from_user':db.get_user_name(message[2]) , 'my_name':self.get_current_user(), 'is_group':'False'})
+        # self.write_message({'messages': self.messages})
+        # else:
+        #     for message in db.get_group_message(db.get_group_id_from_name(to_user)):
+        #         #print(message)
+        #         self.messages.append({'img_path': '/static/images/'+db.get_user_name(message[2])+'.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
+        #     self.write_message({'messages': self.messages})
+
+
+    def on_message(self, message):#メーッセージ受信およびブロードキャスト
+        global to_user
+        global group_flag
+        global waiters
+
+        message = json.loads(message)
+        print("on_message")
+        print(message)
+        print(self.get_current_user())
+        # if(group_flag==False):
+        db.insert_message(db.get_user_id_from_name(message["to_user"]), db.get_user_id_from_name("bot"), db.get_now_time(),message['message'], 0)
+            #self.messages.append(message)
+        # else:
+        #     db.insert_message(db.get_group_id_from_name(message["to_user"]), db.get_user_id_from_name("bot"), db.get_now_time(),message['message'], 0)
+
+        # print(to_user)
+        # print(group_flag)
+        # print(waiters)
+        for waiter in waiters:
+            print(waiter)
+
+            # if group_flag == False:
+            # print(db.get_user_id_from_name(to_user))
+            if self.check_active_time(message["to_user"],message):
+                if waiter[1] != db.get_user_id_from_name(message["to_user"]):
+                    continue
+                else:
+                    waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user':"bot" , 'my_name':"bot" , 'is_group':'False'})
+            else:
+                break
+            # else:
+            #     group_user_list = db.get_group_user_list(db.get_group_id_from_name(message["to_user"]))
+            #     for number in group_user_list:
+            #         if waiter[1] == number:
+            #             if waiter[0] == self:
+            #                 continue
+            #             waiter[0].write_message({'img_path': message['img_path'], 'message': message['message'] , 'to_user': message["to_user"] ,'from_user': "bot", 'my_name':db.get_user_name(number) , 'is_group':'True'})
+
+            print("send:"+waiter[1]+'\nmessage:'+message['message'])
+
+    def on_close(self):
+        global waiters
+        waiters.remove([self,db.get_user_id_from_name("bot")])
+
+    def check_active_time(self,reseiver,message):
+        active_time = db.get_active_time(reseiver)
+        #print(str(active_time[0][0][0:2]))
+        now = datetime.time(datetime.datetime.now().hour,datetime.datetime.now().minute,0)
+        #start = now.strptime(str(active_time[0][0]), '%H:%M')
+        #end = now.strptime(str(active_time[0][1]), '%H:%M')
+        start = datetime.time(int(str(active_time[0][0][0:2])),int(str(active_time[0][0][3:5])),0)
+        end = datetime.time(int(str(active_time[0][1][0:2])),int(str(active_time[0][1][3:5])),0)
+
+        print("check_active_time")
+        print(start)
+        print(end)
+        print(now)
+        if(start <= now and now <= end):
+            return True
+        else:
+            bot_img_path ='static/images/bot.gif'
+            text = "System message:"+message["to_user"]+" is not in active.So your massage is not delivered to "+message["to_user"]+".Your massage is still with system."
+            self.write_message({'img_path': bot_img_path, 'message': text , 'to_user': "bot" ,'from_user': message["to_user"], 'my_name':"bot" , 'is_group':'False'})
+            return False
+
+
+
+
+class ChatHandler(BaseHandler):
+    messages = []
+
+    def open(self, *args, **kwargs):#初期メッセージ送信
+        global to_user
+        global group_flag
+        global waiters
+
+        name = self.get_current_user()
+        user_id = db.get_user_id_from_name(name)
+
+        connector = sqlite3.connect("Chat.db")
+        cursur = connector.cursor()
+        #ユーザがログインした時，そのユーザのIDを1にする
+        sql = 'update User SET Is_in_Lab = 1 where User_ID = ' + user_id
+        print("sql:" + sql)
+        # print("login2_id:" + user_id)
+
+        connector.execute(sql)
+
+        connector.commit()
+
+        cursur.close()
+        connector.close()
+
 
         print("\n\n\n\n\n\n\n\nonope             n\n\n\n\n\n\n\n\n\n\n\n")
 
         print("open")
         print(self)
-        self.waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
+        waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
         self.messages=[]
         if(group_flag == False):
             for message in db.get_message(db.get_user_id_from_name(to_user),db.get_user_id_from_name(self.get_current_user())):
@@ -245,6 +366,7 @@ class ChatHandler(BaseHandler):
     def on_message(self, message):#メーッセージ受信およびブロードキャスト
         global to_user
         global group_flag
+        global waiters
 
         message = json.loads(message)
         print("on_message")
@@ -258,8 +380,8 @@ class ChatHandler(BaseHandler):
 
         print(to_user)
         print(group_flag)
-        print(self.waiters)
-        for waiter in self.waiters:
+        print(waiters)
+        for waiter in waiters:
             print(waiter)
 
             if group_flag == False:
@@ -283,8 +405,26 @@ class ChatHandler(BaseHandler):
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
 
     def on_close(self):
-        self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
-        print("\n\n\n\n\n\n\n\nonclose\n\n\n\n\n\n\n\n\n\n\n")
+
+        name = self.get_current_user()
+        user_id = db.get_user_id_from_name(name)
+
+        connector = sqlite3.connect("Chat.db")
+        cursur = connector.cursor()
+
+        #ユーザがログアウトした時，そのユーザのIDを0にする
+        sql = 'update User SET Is_in_Lab = 0 where User_ID = ' + user_id
+
+        connector.execute(sql)
+
+        connector.commit()
+
+        cursur.close()
+        connector.close()
+
+        global waiters
+        waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
+
 
     def check_active_time(self,reseiver,message):
         active_time = db.get_active_time(reseiver)

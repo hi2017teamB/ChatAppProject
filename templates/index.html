@@ -152,19 +152,28 @@
     var str;
     var group_member = "";
     var group_name;
+    var member;
     if(document.group_name_text.create_group_name.value != ""){
       group_name = document.group_name_text.create_group_name.value;
       str="Create OK?"
+      str = str+"\n"+"--join menber---------------"
       for (var i=0;i<document.menber.elements.length;i++){
         if( document.menber.elements[i].checked )
         {
           group_member+=document.menber.elements[i].value+",";
           str = str+"\n"+document.menber.elements[i].value
+          member = 1;
         }
       }
+      if(member != 1){
+        ret = alert("can not creat\nThere is no one in group.\n");
+      }
+      else{
+        str = str+"\n"+"-------------------------------"
 
-      str = str+"\n"+"groupe name:"+document.group_name_text.create_group_name.value
-      ret = confirm(str);
+        str = str+"\n"+"groupe name:   "+document.group_name_text.create_group_name.value
+        ret = confirm(str);
+      }
       if (ret == true){
         location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
       }
@@ -172,7 +181,7 @@
 
     }
     else if(document.group_name_text.create_group_name.value == ""){
-      ret = confirm("group name is not setted.");
+      ret = alert("can not creat\ngroup name is not setted.");
     }
   }
 
@@ -204,16 +213,12 @@
     }
 
     function send_message(peer, msg, is_left){
-      msg = $.trim($(this).val());
-      if (msg.length > 0) {
-        self.options.messageSent(self.options.id, self.options.user, msg);
-      }
-      $(this).val('');
+      messageSent(peer, msg, is_left);
     }
 
     function set_read_response(){
         //  talk_id=1;
-
+read_response=true;
           location.href = "./set_read_response?"+talk_id
     }
 
@@ -246,7 +251,7 @@
                 <option value="hello">こんにちは</option>
               </select>
             </div>
-          </form><button id="button">挿入</button>
+          </form><button id="button" onclick="insert_template()">insert</button>
         </div>
 
 
@@ -259,9 +264,9 @@
     <!-- ナビゲーション開始 -->
     <div id="nav">
 
-      <form action="#">
+      <!-- <form action="#">
         <input type="button" value="setting" onclick="window.open('setting', 'new', 'width=500,height=400');">
-      </form>
+      </form> -->
 
       <input type="button" value="setting" data-target="con1" class="modal-open">
       <input type="button" value="member's active time" data-target="con2" class="modal-open">
@@ -509,6 +514,13 @@
           <body>
             <h2>HI_lab member's Active time</h2>
             <li>Active Time</li>
+            <!-- {% for user in my_active_time %}
+            <br>{{my_active_time}}
+            {% end %} -->
+
+            {%for user_time in all_active_time%}
+            {{user_time}}<br>
+            {% end %}
           </body>
           <p><a class="modal-close">close</a></p>
         </div>
@@ -549,10 +561,11 @@
             <!-- フッタ開始 -->
             <div id="footer">
               <a href=/auth/logout>Logout</a>
-              <div  valign="bottom">
-                <button id="send_button" onclick="send_message()">send</button>
+              <!-- <div  valign="bottom">
+                <button id="send_button" onclick="messageSent(img_path, msg ,to_user)">send</button>
                 <button id="send_button_with_response" onclick="set_read_response(peer, msg, is_left)">send with response</button>
-              </div></div>
+              </div> -->
+            </div>
               <!-- フッタ終了 -->
 
         </div>

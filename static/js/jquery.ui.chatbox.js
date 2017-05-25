@@ -10,7 +10,7 @@
  * Also uses some styles for jquery.ui.dialog
  *
  */
-
+var read_response=false;
 
 // TODO: implement destroy()
 (function($) {
@@ -63,7 +63,7 @@
                     $(msgElement).text(msg);
 
           already_read = true;
-           read_response = true;
+          //  read_response = true;
 		    if (is_left) {
 
 			$(msgElement).addClass("balloon-left");

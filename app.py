@@ -112,7 +112,7 @@ class MainHandler(BaseHandler):
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
         if(is_permit):
-            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()))
+            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time())
 
 class ErrorHandler(BaseHandler):
     def get(self):
@@ -151,7 +151,7 @@ class CreateGroupeHandler(BaseHandler):
                 group_list.append(group)
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()))
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time())
 
     def post(self):
         print("CreateGroupeHandler")
@@ -178,7 +178,7 @@ class DeleteGroupeHandler(BaseHandler):
                 group_list.append(group)
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
-        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()))
+        self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time())
 
         #self.render("index.html")
 
@@ -222,6 +222,8 @@ class ChatHandler(BaseHandler):
     def open(self, *args, **kwargs):#初期メッセージ送信
         global to_user
         global group_flag
+
+        print("\n\n\n\n\n\n\n\nonope             n\n\n\n\n\n\n\n\n\n\n\n")
 
         print("open")
         print(self)
@@ -282,6 +284,7 @@ class ChatHandler(BaseHandler):
 
     def on_close(self):
         self.waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
+        print("\n\n\n\n\n\n\n\nonclose\n\n\n\n\n\n\n\n\n\n\n")
 
     def check_active_time(self,reseiver,message):
         active_time = db.get_active_time(reseiver)

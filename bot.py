@@ -33,7 +33,7 @@ def send_massage(to_user,message_text):
         }
         ws.send(json.dumps(message))
     #メッセージを送信
-    
+
 
 def match_schedule(r):
     flag = False
@@ -100,6 +100,10 @@ def enter_schedule():
         print(s)
         if s == False:
             send_massage([db.get_user_name(message[1])],"文法エラーです")
+            return
+        else:
+            send_massage([db.get_user_name(message[1])],message[0]+"します")
+
 
 
         #print(s)
@@ -314,7 +318,7 @@ def span_flag(span):
 
 
 def syntax_matching(message):
-    pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に?(?P<item>\S+)をリマインド$"
+    pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に(?P<item>\S+)をリマインド$"
     #pattern = "^(?P<span>次の?|毎(週|月)|来週の?|来月の?|来年の?)?(?P<days>([0-9]{4}年[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}月[0-9]{1,2}日|[0-9]{1,2}日|末|(第[1-5])?[日月火水木金土]曜日?)+)の?(?P<time>(午前|午後)?[0-9]{1,2}時([0-9]{1,2}分)?|(AM|PM|am|pm)?[0-9]{1,2}:[0-9]{1,2})に?(?P<lab>研究室にいる|研究室の)?(?P<member>B4|M1|M2|awareness|AWARENESS|novel\s?interface|NOVEL\s?INTERFACE|cmc|CMC|全員|人)に?(?P<item>\S+)をリマインド$"
     match = re.search(pattern, message)
 
@@ -383,4 +387,4 @@ if __name__ == '__main__':
         # print (datetime.now().weekday())
 
         #send_massage(["konishi","tanaka","shirasawa"],"ボットの自動送信機能のテストです")
-        time.sleep(10000);
+        time.sleep(1);

@@ -93,44 +93,50 @@ def match_schedule(r):
 
 def enter_schedule():
     messages = db.get_unread_message_for_bot()
+    pattern = "誰がいる"
     print(messages)
     for message in messages:
         print(message)
-        s = syntax_matching(message[0])
-        print(s)
-        if s == False:
-            send_massage([db.get_user_name(message[1])],"文法エラーです")
-            return
+        match = re.search(pattern, message[0])
+        if match:
+            lab_member = db.get_in_lab_member()
+            # send_massage([db.get_user_name(message[1])],"文法エラーです")
+            send_massage([db.get_user_name(message[1])], lab_member)
         else:
-            send_massage([db.get_user_name(message[1])],message[0]+"します")
+            s = syntax_matching(message[0])
+            print(s)
+            if s == False:
+                send_massage([db.get_user_name(message[1])],"文法エラーです")
+                return
+            else:
+                send_massage([db.get_user_name(message[1])],message[0]+"します")
+
+            #print(s)
+            if s.span is None:
+                s.span=""
+                s.show_all()
+            month, week, s_flag = span_flag(s.span)
+            d_list, me_list, wn_list = calc_startday(s_flag, s.days)
+            member = select_member(s.grade)
+            is_in_lab = select_is_in_lab(s.in_lab)
+
+            if d_list != False:
+                print(d_list)
+
+            t = calc_time(s.time)
+            if t != False:
+                print(t)
+
+            input_datetime_list = [datetime.combine(d,t) for d in d_list]
+
+            for (i, me, wn) in zip(input_datetime_list, me_list, wn_list):
+                i_str = i.strftime('%Y/%m/%d-%H:%M:%S')
+                db.insert_reminder(s.item, month, me, week, wn, i_str, member, is_in_lab, 1)
 
 
 
-        #print(s)
-        if s.span is None:
-            s.span=""
-            s.show_all()
-        month, week, s_flag = span_flag(s.span)
-        d_list, me_list, wn_list = calc_startday(s_flag, s.days)
-        member = select_member(s.grade)
-        is_in_lab = select_is_in_lab(s.in_lab)
+            # s.show_all()
 
-        if d_list != False:
-            print(d_list)
-
-        t = calc_time(s.time)
-        if t != False:
-            print(t)
-
-        input_datetime_list = [datetime.combine(d,t) for d in d_list]
-
-        for (i, me, wn) in zip(input_datetime_list, me_list, wn_list):
-            i_str = i.strftime('%Y/%m/%d-%H:%M:%S')
-            db.insert_reminder(s.item, month, me, week, wn, i_str, member, is_in_lab, 1)
-
-
-
-        # s.show_all()
 
 def select_member(grade):
     if grade in {"人", "全員"} :

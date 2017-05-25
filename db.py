@@ -150,6 +150,17 @@ def change_start_datetime(bot_id, next_datetime):
 	result = execute_sql("update bot set Start_datetime = \"" + next_datetime + "\" where Bot_id = " + str(bot_id))
 	return
 
+def get_in_lab_member():
+	results = execute_sql("select Name from User where Is_in_Lab = 1")
+	member_list = "研究室にいるメンバは"
+	for result in results:
+		member_list = member_list  + ", " + result[0]
+
+	member_list += "です"
+
+	return member_list
+
+
 
 def execute_sql(sql):
 	print(sql)

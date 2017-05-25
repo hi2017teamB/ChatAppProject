@@ -9,6 +9,7 @@
   <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
   <script src="{{ static_url('js/index.js') }}"></script>
   <script src="{{ static_url('js/jquery.ui.chatbox.js') }}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/push.js/0.0.11/push.min.js"></script>
 
 
   <script>
@@ -24,7 +25,6 @@
     function getUrlVars(){
       var vars = [], max = 0, hash = "", array = "";
       var url = window.location.search;
-
     //?を取り除くため、1から始める。複数のクエリ文字列に対応するため、&で区切る
     hash  = url.slice(1).split('&');
     max = hash.length;
@@ -34,9 +34,21 @@
       is_group = array[0];
       vars[array[0]] = array[1];    //先ほど確保したkeyに、値を代入。
     }
-
     return vars;
   }
+
+ 
+ Push.Permission.request();
+
+//  function doNotification(title,body,icon){
+//   Push.create(title, { 　　body: body, 　　icon: icon, 　　timeout: 2000, // 通知が消えるタイミング 　　
+//   vibrate: [100, 100, 100], // モバイル端末でのバイブレーション秒数 　　
+//   onClick: function() { 　　　　// 通知がクリックされた場合の設定 　　　　
+//     console.log(this); 　　
+//   } 
+// });
+//  }
+
   socket.onopen = function(data) {
   }
   socket.onclose = function() {
@@ -62,11 +74,52 @@
             $("#chat_div").chatbox("option", "boxManager").addMsg(messages[i].img_path, messages[i].message, false);
           }
         }
+        //if(messages[i].my_name == messages[i].to_user){
+          //do_Notification("新規メッセージがあります",messages[i].img_path,"通知",null,5000)
+        //}
       }
-    } else {
+    } else if('newuser' in data) {
+      Push.create(data.newuser+'がログインしました', 
+            {
+            body: data.newuser+'がログインしました', 
+            icon: "/static/images/bot.gif", 
+            timeout: 8000, // 通知が消えるタイミング 　　
+            vibrate: [100, 100, 100], // モバイル端末でのバイブレーション秒数 　　
+            onClick: function() { 　　　　// 通知がクリックされた場合の設定 　　　
+              　console.log(this); 　　
+            } 
+        }
+      );
+
+    }else if('lostuser' in data){
+      Push.create(data.lostuser+'がログアウトしました', 
+            {
+            body: data.lostuser+'がログアウトしました', 
+            icon: "/static/images/bot.gif", 
+            timeout: 8000, // 通知が消えるタイミング 　　
+            vibrate: [100, 100, 100], // モバイル端末でのバイブレーション秒数 　　
+            onClick: function() { 　　　　// 通知がクリックされた場合の設定 　　　
+              　console.log(this); 　　
+            } 
+        }
+      );
+    }
+    else {
       // if(val["request_user"]==messages[i].to_user && messages[i].my_name == messages[i].from_user ){
       //     $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
       // }
+      Push.create(data.from_user+'からの新規メッセージ', 
+            {
+            body: data.message, 
+            icon: data.img_path, 
+            timeout: 8000, // 通知が消えるタイミング 　　
+            vibrate: [100, 100, 100], // モバイル端末でのバイブレーション秒数 　　
+            onClick: function() { 　　　　// 通知がクリックされた場合の設定 　　　
+              　console.log(this); 　　
+            } 
+        }
+      );
+
       if(data.is_group == 'False'){
         if(val[is_group]==data.from_user){
           $("#chat_div").chatbox("option", "boxManager").addMsg(data.img_path, data.message, false);
@@ -77,7 +130,8 @@
         }
       }
     }
-
+    //var n = Notification("New Message")
+    //doNotification("新規メッセージがあります","からの新着メッセージがあります",icon.png);
   }
 
 

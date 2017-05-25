@@ -214,7 +214,9 @@ class AuthLoginHandler(BaseHandler):
 
         if user_id!=None:
             self.set_current_user(username)
-
+            for waiter in waiters:
+                print("new user notification")
+                waiter[0].write_message({'newuser' : username})
             self.redirect('/')
 
         else:
@@ -224,6 +226,11 @@ class AuthLoginHandler(BaseHandler):
 class AuthLogoutHandler(BaseHandler):
 
     def get(self):
+        user = self.get_current_user()
+        for waiter in waiters:
+                print("lost user notification")
+                waiter[0].write_message({'lostuser' : user})
+
         self.clear_current_user()
 
         self.redirect('/')
@@ -331,6 +338,7 @@ class ChatHandler(BaseHandler):
         global group_flag
         global waiters
 
+
         name = self.get_current_user()
         user_id = db.get_user_id_from_name(name)
 
@@ -365,7 +373,6 @@ class ChatHandler(BaseHandler):
                 #print(message)
                 self.messages.append({'img_path': '/static/images/'+db.get_user_name(message[2])+'.gif', 'message': message[4] , 'to_user':db.get_group_name(message[1]) ,'from_user': db.get_user_name(message[2]), 'my_name':self.get_current_user() , 'is_group':'True'})
             self.write_message({'messages': self.messages})
-
 
 
     def on_message(self, message):#メーッセージ受信およびブロードキャスト

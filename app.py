@@ -43,8 +43,8 @@ class Application(tornado.web.Application):
             (r'/chats*',MainHandler),
             (r'/bot_only*',BotHandler),
             (r'/permission_deny',ErrorHandler),
-            (r'/creategroupe*',CreateGroupeHandler),
-            (r'/deletegroupe*',DeleteGroupeHandler),
+            (r'/creategroup*',CreateGroupeHandler),
+            (r'/deletegroup*',DeleteGroupeHandler),
             (r'/set_active_time*',Set_active_time_hander),
             (r'/set_read_response*',Set_Read_Res),
         ]
@@ -117,7 +117,12 @@ class MainHandler(BaseHandler):
         user_list = db.get_user_list()
         user_list.remove(self.get_current_user())
         if(is_permit):
-            self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time(),readed_user="tanaka")
+            groupid = db.get_group_id_from_name(to_user)
+            if(groupid is None):
+                self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time(),talk_name=to_user,readed_user="tanaka")
+            else:
+                self.render('index.html', img_path=self.static_url('images/' + img_name),user_name=str(self.get_current_user()),user_list=user_list,group_list=group_list,my_name=self.get_current_user(),my_active_time = db.get_my_active_time(self.get_current_user()),all_active_time= db.get_all_active_time(),talk_name=to_user,users=db.get_user_name_from_group(groupid),readed_user="tanaka")
+
 
 class ErrorHandler(BaseHandler):
     def get(self):

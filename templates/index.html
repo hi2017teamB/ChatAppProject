@@ -106,6 +106,9 @@
       $("#chat_div").width(content_width-10);
       $("#chat_div").height(content_height-4);
       //  $("#chat_div").chatbox(offset, content_off-5, 500);
+
+
+
     });
 
   $(function(){
@@ -156,7 +159,7 @@
     if(document.group_name_text.create_group_name.value != ""){
       group_name = document.group_name_text.create_group_name.value;
       str="Create OK?"
-      str = str+"\n"+"--join menber---------------"
+      str = str+"\n"+"--join member---------------"
       for (var i=0;i<document.menber.elements.length;i++){
         if( document.menber.elements[i].checked )
         {
@@ -166,16 +169,16 @@
         }
       }
       if(member != 1){
-        ret = alert("can not creat\nThere is no one in group.\n");
+        ret = alert("can not create\nThere is no one in group.\n");
       }
       else{
         str = str+"\n"+"-------------------------------"
 
-        str = str+"\n"+"groupe name:   "+document.group_name_text.create_group_name.value
+        str = str+"\n"+"group name:   "+document.group_name_text.create_group_name.value
         ret = confirm(str);
       }
       if (ret == true){
-        location.href = "./creategroupe?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
+        location.href = "./creategroup?group_member="+group_member.substr(0,group_member.length-1)+"&group_name="+group_name
       }
 
 
@@ -204,7 +207,7 @@
 
       if(group_name != "select group name"){
         if (confirm(str)){
-          location.href = "./deletegroupe?group_name="+group_name
+          location.href = "./deletegroup?group_name="+group_name
         }
       }
       else{
@@ -228,7 +231,6 @@ read_response=true;
     }
 
 
-
     </script>
   </head>
 
@@ -243,9 +245,26 @@ read_response=true;
 
       <FONT size="7" face="Comic Sans MS">Message Application in HI_lab</FONT>
       <br>
+      <FONT size="5" >
       You are log in as {{user_name}}.<br>
 
+      You are talking with
+      {{talk_name}}
+      <!-- {% if user_name == talk_name %}
+      {{talk_name}}
+      {% end %} -->
+      </FONT><br>
+      {% for group in group_list %}
+      {% if group[0] == talk_name %}
+      member:
+      {% end %}
+      {% end %}
 
+      {% for group in group_list %}
+      {% if group[0] == talk_name %}
+      {{users}}
+      {% end %}
+      {% end %}
       <!-- Autocomplete -->
 
       <!-- <div Align="right">
@@ -505,14 +524,14 @@ read_response=true;
               <!-- location.reload();-->
               <br><br>
             </ul>
-            <li>template create</li>
+            <!-- <li>template create</li>
             <ul>
               template:
               <form>
                 <textarea name="template_message" rows="3" cols="50" wrap="hard">
                 </textarea>
               </form>
-            </ul>
+            </ul> -->
           </body>
           <p><a class="modal-close">close</a></p>
         </div>

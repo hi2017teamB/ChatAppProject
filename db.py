@@ -105,6 +105,19 @@ def get_group_name(id):
 	else:
 		return str(result[0][0])
 
+def get_user_name_from_group(group_id):
+	results = execute_sql("select User_ID from 'Group' where Group_ID = " + group_id)
+	member_list = ""
+	print("\n\n\n\n\n\\n\n\n\n\n\\n\n\n\n\n\n\\n\n\n\n\n")
+	print(results)
+	aa = results[0][0].split(",")
+	print(aa)
+	for a in aa:
+		print(a)
+		member_list += (get_user_name(a) + ",")
+
+	return member_list[0:len(member_list)-1]
+
 
 def get_user_name(user_id):
 	result = execute_sql("select Name from User where User_id = " + str(user_id))

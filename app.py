@@ -307,6 +307,9 @@ class BotHandler(BaseHandler):
         waiters.remove([self,db.get_user_id_from_name("bot")])
 
     def check_active_time(self,reseiver,message):
+        # if(db.get_is_in_lab_user(reseiver)):
+        #     return True
+
         active_time = db.get_active_time(reseiver)
         #print(str(active_time[0][0][0:2]))
         now = datetime.time(datetime.datetime.now().hour,datetime.datetime.now().minute,0)
@@ -439,6 +442,9 @@ class ChatHandler(BaseHandler):
 
 
     def check_active_time(self,reseiver,message):
+        # if(db.get_is_in_lab_user(reseiver)):
+        #     return True
+
         active_time = db.get_active_time(reseiver)
         #print(str(active_time[0][0][0:2]))
         now = datetime.time(datetime.datetime.now().hour,datetime.datetime.now().minute,0)

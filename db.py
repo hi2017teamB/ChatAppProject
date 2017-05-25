@@ -173,6 +173,13 @@ def get_in_lab_member():
 
 	return member_list
 
+def get_is_in_lab_user(username):
+	result = execute_sql("select Is_in_Lab from user where name = \'"+username+"\'")
+	if(result[0][0] == 1):
+		return True
+	else:
+		return False
+	
 
 
 def execute_sql(sql):

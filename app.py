@@ -20,6 +20,7 @@ import logging
 import db
 import datetime
 import time
+import sqlite3
 
 define("port", default=5000, type=int)
 define("username", default="user")
@@ -204,9 +205,12 @@ class AuthLoginHandler(BaseHandler):
 
         logging.debug('AuthLoginHandler:post %s %s' % (username, password))
         user_id = db.get_user_id(username,password)
+        print("login1_id:" + user_id)
         if user_id!=None:
             self.set_current_user(username)
+
             self.redirect('/')
+
         else:
             self.render("login_error.html")
 
@@ -215,7 +219,9 @@ class AuthLogoutHandler(BaseHandler):
 
     def get(self):
         self.clear_current_user()
+
         self.redirect('/')
+
 
 class BotHandler(BaseHandler):
     messages = []
@@ -319,6 +325,24 @@ class ChatHandler(BaseHandler):
         global group_flag
         global waiters
 
+        name = self.get_current_user()
+        user_id = db.get_user_id_from_name(name)
+
+        connector = sqlite3.connect("Chat.db")
+        cursur = connector.cursor()
+        #ユーザがログインした時，そのユーザのIDを1にする
+        sql = 'update User SET Is_in_Lab = 1 where User_ID = ' + user_id
+        print("sql:" + sql)
+        print("login2_id:" + user_id)
+
+        connector.execute(sql)
+
+        connector.commit()
+
+        cursur.close()
+        connector.close()
+
+
         print("open")
         print(self)
         waiters.append([self,db.get_user_id_from_name(self.get_current_user())])
@@ -378,6 +402,22 @@ class ChatHandler(BaseHandler):
             print("send:"+waiter[1]+'\nmessage:'+message['message'])
 
     def on_close(self):
+        name = self.get_current_user()
+        user_id = db.get_user_id_from_name(name)
+
+        connector = sqlite3.connect("Chat.db")
+        cursur = connector.cursor()
+
+        #ユーザがログアウトした時，そのユーザのIDを0にする
+        sql = 'update User SET Is_in_Lab = 0 where User_ID = ' + user_id
+
+        connector.execute(sql)
+
+        connector.commit()
+
+        cursur.close()
+        connector.close()
+
         global waiters
         waiters.remove([self,db.get_user_id_from_name(self.get_current_user())])
 
